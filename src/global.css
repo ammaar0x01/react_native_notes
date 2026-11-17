@@ -1,0 +1,21 @@
+/* Global web reset — keeps the app edge-to-edge (no default body margin/border). */
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Avoid the default grey focus/selection chrome around app surfaces. */
+#root,
+#root > div {
+  border: 0;
+  outline: none;
+}

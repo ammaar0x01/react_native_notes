@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Money Manager",
+    "slug": "money-manager",
+    "version": "1.3.0",
+    "orientation": "portrait",
+
+    "icon": "./assets/icon.jpeg",
+    "scheme": "money-manager",
+    "userInterfaceStyle": "automatic",
+
+    "ios": {
+      "icon": "./assets/icon.jpeg",
+      "bundleIdentifier": "com.amm0x01.moneymanager",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#050807",
+        "foregroundImage": "./assets/adaptive-icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.amm0x01.moneymanager"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#050807",
+          "image": "./assets/splash-icon.jpeg",
+          "imageWidth": 140,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#000000",
+            "image": "./assets/splash-icon.jpeg"
+          }
+        }
+      ],
+      "expo-font",
+      "expo-sharing"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f15b1cee-9584-4261-8242-acefbb3b9e84"
+      }
+    }
+  }
+}
