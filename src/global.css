@@ -19,3 +19,31 @@ body,
   border: 0;
   outline: none;
 }
+
+
+/* --- newer --- */
+/* Custom Thin Dark Scrollbar for Web */
+::-webkit-scrollbar {
+  height: 6px; /* Thin horizontal scrollbar */
+  width: 6px;  /* Thin vertical scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #0F1115; /* Matches your background */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2E3340; /* Matches your border color */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #F59E0B; /* Highlights to your yellow-orange accent on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2E3340 #0F1115;
+}
