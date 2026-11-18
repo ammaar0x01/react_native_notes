@@ -1,8 +1,3136 @@
+// // // import React, { useEffect, useState } from 'react';
+// // // import {
+// // //   ActivityIndicator,
+// // //   Alert,
+// // //   FlatList,
+// // //   Modal,
+// // //   Platform,
+// // //   Pressable,
+// // //   ScrollView,
+// // //   StyleSheet,
+// // //   Text,
+// // //   TextInput,
+// // //   useWindowDimensions,
+// // //   View,
+// // // } from 'react-native';
+// // // import { Ionicons } from '@expo/vector-icons';
+// // // import AsyncStorage from '@react-native-async-storage/async-storage';
+// // // import * as FileSystem from 'expo-file-system/legacy';
+// // // import * as Sharing from 'expo-sharing';
+// // // import * as DocumentPicker from 'expo-document-picker';
+// // // import * as MailComposer from 'expo-mail-composer';
+
+// // // import { STORAGE_KEYS } from '@/constants/storage';
+// // // import {
+// // //   buildCsv,
+// // //   buildXls,
+// // //   createBackupFile,
+// // //   isExpense,
+// // //   isRecord,
+// // //   normalizeImport,
+// // //   type BackupData,
+// // //   type ExportFormat,
+// // //   type ImportData,
+// // // } from '@/utils/dataExport';
+// // // import { GlobalStyles } from '@/global.styles';
+// // // import { router } from 'expo-router';
+// // // // import { checkAndPromptWeeklyBackup } from '@/utils/dataBackup';
+
+
+// // // // Expanded list of global currencies
+// // // const ALL_CURRENCIES = [
+// // //   { label: 'South African Rand (R)', symbol: 'R', code: 'ZAR' },
+// // //   { label: 'US Dollar ($)', symbol: '$', code: 'USD' },
+// // //   { label: 'Euro (€)', symbol: '€', code: 'EUR' },
+// // //   { label: 'British Pound (£)', symbol: '£', code: 'GBP' },
+// // //   { label: 'Australian Dollar (A$)', symbol: 'A$', code: 'AUD' },
+// // //   { label: 'Canadian Dollar (C$)', symbol: 'C$', code: 'CAD' },
+// // //   { label: 'Indian Rupee (₹)', symbol: '₹', code: 'INR' },
+// // //   { label: 'Japanese Yen (¥)', symbol: '¥', code: 'JPY' },
+// // //   { label: 'Chinese Yuan (¥)', symbol: '¥', code: 'CNY' },
+// // //   { label: 'Brazilian Real (R$)', symbol: 'R$', code: 'BRL' },
+// // //   { label: 'Mexican Peso ($)', symbol: '$', code: 'MXN' },
+// // //   { label: 'New Zealand Dollar (NZ$)', symbol: 'NZ$', code: 'NZD' },
+// // //   { label: 'Swiss Franc (CHF)', symbol: 'CHF', code: 'CHF' },
+// // //   { label: 'Singapore Dollar (S$)', symbol: 'S$', code: 'SGD' },
+// // // ];
+
+// // // const parseStoredJson = (raw: string | null): unknown => {
+// // //   if (!raw) return null;
+
+// // //   try {
+// // //     return JSON.parse(raw);
+// // //   } catch {
+// // //     return null;
+// // //   }
+// // // };
+
+// // // const notify = (title: string, message: string) => {
+// // //   if (Platform.OS === 'web') {
+// // //     window.alert(`${title}\n\n${message}`);
+// // //   } else {
+// // //     Alert.alert(title, message);
+// // //   }
+// // // };
+
+
+
+// // // export default function SettingsScreen() {
+// // //   const { width } = useWindowDimensions();
+// // //   const horizontalPadding = width >= 768 ? 40 : 20;
+
+// // //   const [currentCurrency, setCurrentCurrency] = useState<string>('ZAR');
+// // //   const [modalVisible, setModalVisible] = useState<boolean>(false);
+// // //   const [searchQuery, setSearchQuery] = useState<string>('');
+
+// // //   const [exportModalVisible, setExportModalVisible] = useState<boolean>(false);
+// // //   const [exporting, setExporting] = useState<boolean>(false);
+// // //   const [importing, setImporting] = useState<boolean>(false);
+// // //   const [cloudActionLoading, setCloudActionLoading] = useState<boolean>(false);
+
+// // //   useEffect(() => {
+// // //     loadSettings();
+      
+// // //     // checkAndPromptWeeklyBackup(handleSendEmailBackup);
+// // //     // checkAndPromptWeeklyBackup(handleUploadToCloud);
+
+// // //   }, []);
+
+
+  
+// // //     // --- Backup reminders 
+// // //   // useEffect(() => {
+// // //   //     // Pass your email backup handler function here
+// // //   //     checkAndPromptWeeklyBackup(handleSendEmailBackup);
+// // //   //   }, []);
+// // //   // }
+
+// // //   const loadSettings = async () => {
+// // //     try {
+// // //       const savedCurrency = await AsyncStorage.getItem(STORAGE_KEYS.currency);
+// // //       if (savedCurrency) {
+// // //         setCurrentCurrency(savedCurrency);
+// // //       }
+// // //     } catch (error) {
+// // //       console.error('Failed to load settings', error);
+// // //     }
+// // //   };
+
+// // //   const handleCurrencyChange = async (code: string, symbol: string) => {
+// // //     try {
+// // //       setCurrentCurrency(code);
+// // //       await AsyncStorage.setItem(STORAGE_KEYS.currency, code);
+// // //       setModalVisible(false);
+// // //       setSearchQuery('');
+
+// // //       if (Platform.OS === 'web') {
+// // //         window.alert(`Currency changed to ${symbol}`);
+// // //       } else {
+// // //         Alert.alert('Success', `Currency updated to ${symbol}`);
+// // //       }
+// // //     } catch (error) {
+// // //       console.error('Failed to save currency', error);
+// // //     }
+// // //   };
+
+// // //   const selectedCurrencyObj = ALL_CURRENCIES.find((c) => c.code === currentCurrency) || {
+// // //     label: `South African Rand (${currentCurrency})`,
+// // //     symbol: currentCurrency,
+// // //   };
+
+// // //   const filteredCurrencies = ALL_CURRENCIES.filter(
+// // //     (item) =>
+// // //       item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+// // //       item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+// // //       item.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+// // //   );
+
+// // //   // ----------------------------------
+// // //   // Export helpers
+// // //   // ----------------------------------
+// // //   const readBackupData = async (): Promise<BackupData> => {
+// // //     const [
+// // //       expensesRaw,
+// // //       budgetRaw,
+// // //       currencyRaw,
+// // //       profileRaw,
+// // //       firstUsedRaw,
+// // //       seededRaw,
+// // //       shoppingRaw,
+// // //       notesRaw,
+// // //     ] = await Promise.all([
+// // //       AsyncStorage.getItem(STORAGE_KEYS.expenses),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.monthlyBudget),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.currency),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.profile),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.firstUsed),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.monthlyDummySeeded),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.shoppingLists),
+// // //       AsyncStorage.getItem(STORAGE_KEYS.notes),
+// // //     ]);
+
+// // //     const parsedExpenses = parseStoredJson(expensesRaw);
+// // //     const parsedBudget = Number(budgetRaw);
+// // //     const parsedProfile = parseStoredJson(profileRaw);
+// // //     const parsedShopping = parseStoredJson(shoppingRaw);
+// // //     const parsedNotes = parseStoredJson(notesRaw);
+
+// // //     return {
+// // //       expenses: Array.isArray(parsedExpenses)
+// // //         ? parsedExpenses.filter(isExpense)
+// // //         : [],
+// // //       monthlyBudget:
+// // //         budgetRaw && Number.isFinite(parsedBudget) && parsedBudget > 0
+// // //           ? parsedBudget
+// // //           : null,
+// // //       currency: currencyRaw || null,
+// // //       profile: isRecord(parsedProfile) ? parsedProfile : null,
+// // //       firstUsed: firstUsedRaw || null,
+// // //       monthlyDummySeeded: seededRaw === 'true',
+// // //       notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+// // //     };
+// // //   };
+
+// // //   const saveFile = async (
+// // //     fileName: string,
+// // //     content: string,
+// // //     mimeType: string
+// // //   ): Promise<void> => {
+// // //     if (Platform.OS === 'web') {
+// // //       const blob = new Blob([content], { type: mimeType });
+// // //       const url = URL.createObjectURL(blob);
+// // //       const link = document.createElement('a');
+// // //       link.href = url;
+// // //       link.download = fileName;
+// // //       document.body.appendChild(link);
+// // //       link.click();
+// // //       document.body.removeChild(link);
+// // //       URL.revokeObjectURL(url);
+// // //       return;
+// // //     }
+
+// // //     const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// // //     if (!directory) {
+// // //       throw new Error('No writable directory is available on this device.');
+// // //     }
+
+// // //     const fileUri = `${directory}${fileName}`;
+// // //     await FileSystem.writeAsStringAsync(fileUri, content, {
+// // //       encoding: FileSystem.EncodingType.UTF8,
+// // //     });
+
+// // //     if (await Sharing.isAvailableAsync()) {
+// // //       await Sharing.shareAsync(fileUri, {
+// // //         mimeType,
+// // //         dialogTitle: 'Export Money Manager data',
+// // //       });
+// // //     } else {
+// // //       notify('Export saved', `The file was saved to ${fileUri}`);
+// // //     }
+// // //   };
+
+// // //   const handleExportData = async (format: ExportFormat) => {
+// // //     setExporting(true);
+
+// // //     try {
+// // //       const backup = await readBackupData();
+// // //       const stamp = new Date().toISOString().slice(0, 10);
+
+// // //       if (format === 'json') {
+// // //         const file = createBackupFile(backup);
+
+// // //         await saveFile(
+// // //           `MoneyManager_Backup_${stamp}.json`,
+// // //           JSON.stringify(file, null, 2),
+// // //           'application/json'
+// // //         );
+// // //       } else if (format === 'csv') {
+// // //         await saveFile(
+// // //           `MoneyManager_Expenses_${stamp}.csv`,
+// // //           buildCsv(backup.expenses, backup.currency),
+// // //           'text/csv;charset=utf-8'
+// // //         );
+// // //       } else {
+// // //         await saveFile(
+// // //           `MoneyManager_Expenses_${stamp}.xls`,
+// // //           buildXls(backup),
+// // //           'application/vnd.ms-excel'
+// // //         );
+// // //       }
+
+// // //       setExportModalVisible(false);
+// // //       notify(
+// // //         'Export complete',
+// // //         format === 'json'
+// // //           ? 'A complete JSON backup was created. Keep it safe — it can be imported later.'
+// // //           : 'Your expense data was exported as a spreadsheet.'
+// // //       );
+// // //     } catch (error) {
+// // //       console.error('Export failed', error);
+// // //       notify('Export failed', 'Could not create the export file. Please try again.');
+// // //     } finally {
+// // //       setExporting(false);
+// // //     }
+// // //   };
+
+// // //   // ----------------------------------
+// // //   // Cloud & Email Backup Integrations (Cross-Platform)
+// // //   // ----------------------------------
+// // //   const handleUploadToCloud = async () => {
+// // //     setCloudActionLoading(true);
+// // //     try {
+// // //       const backup = await readBackupData();
+// // //       const stamp = new Date().toISOString().slice(0, 10);
+// // //       const fileName = `MoneyManager_Backup_${stamp}.json`;
+// // //       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+// // //       if (Platform.OS === 'web') {
+// // //         // On web, trigger download which saves to local/cloud-synced folders (Google Drive / OneDrive desktop apps)
+// // //         const blob = new Blob([content], { type: 'application/json' });
+// // //         const url = URL.createObjectURL(blob);
+// // //         const link = document.createElement('a');
+// // //         link.href = url;
+// // //         link.download = fileName;
+// // //         document.body.appendChild(link);
+// // //         link.click();
+// // //         document.body.removeChild(link);
+// // //         URL.revokeObjectURL(url);
+// // //         notify('Cloud / Local Backup Saved', 'Your JSON backup file has been downloaded. Save it to your cloud-synced folder (Google Drive, OneDrive, etc.).');
+// // //       } else {
+// // //         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// // //         if (!directory) throw new Error('No writable directory available.');
+// // //         const fileUri = `${directory}${fileName}`;
+// // //         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+// // //         if (await Sharing.isAvailableAsync()) {
+// // //           await Sharing.shareAsync(fileUri, {
+// // //             mimeType: 'application/json',
+// // //             dialogTitle: 'Upload Backup to Cloud / Files',
+// // //           });
+// // //         } else {
+// // //           notify('Unavailable', 'Sharing is not available on this device.');
+// // //         }
+// // //       }
+// // //     } catch (error) {
+// // //       console.error('Cloud upload failed', error);
+// // //       notify('Error', 'Could not prepare backup for cloud upload.');
+// // //     } finally {
+// // //       setCloudActionLoading(false);
+// // //     }
+// // //   };
+
+// // //   const handleSendEmailBackup = async () => {
+// // //     setCloudActionLoading(true);
+// // //     try {
+// // //       const backup = await readBackupData();
+// // //       const stamp = new Date().toISOString().slice(0, 10);
+// // //       const fileName = `MoneyManager_Backup_${stamp}.json`;
+// // //       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+// // //       if (Platform.OS === 'web') {
+// // //         // On web, also download file so user can attach it, and open mailto link
+// // //         const blob = new Blob([content], { type: 'application/json' });
+// // //         const url = URL.createObjectURL(blob);
+// // //         const link = document.createElement('a');
+// // //         link.href = url;
+// // //         link.download = fileName;
+// // //         document.body.appendChild(link);
+// // //         link.click();
+// // //         document.body.removeChild(link);
+// // //         URL.revokeObjectURL(url);
+
+// // //         const subject = encodeURIComponent('Money Manager - JSON Backup');
+// // //         const body = encodeURIComponent('Please find your downloaded Money Manager JSON backup file attached to this email.');
+// // //         window.location.href = `mailto:?subject=${subject}&body=${body}`;
+// // //         notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your newly opened email window.');
+// // //       } else {
+// // //         const isAvailable = await MailComposer.isAvailableAsync();
+// // //         if (!isAvailable) {
+// // //           notify('Email Unavailable', 'This device is not configured to send emails.');
+// // //           return;
+// // //         }
+
+// // //         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// // //         if (!directory) throw new Error('No writable directory available.');
+// // //         const fileUri = `${directory}${fileName}`;
+// // //         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+// // //         await MailComposer.composeAsync({
+// // //           subject: 'Money Manager - Automated JSON Backup',
+// // //           body: 'Attached is your latest JSON backup file for Money Manager. Save this file securely to restore your expenses if needed.',
+// // //           attachments: [fileUri],
+// // //         });
+// // //       }
+// // //     } catch (error) {
+// // //       console.error('Email backup failed', error);
+// // //       notify('Error', 'Could not open email composer.');
+// // //     } finally {
+// // //       setCloudActionLoading(false);
+// // //     }
+// // //   };
+
+// // //   // ----------------------------------
+// // //   // Import helpers
+// // //   // ----------------------------------
+// // //   const confirmImport = (data: ImportData): Promise<boolean> => {
+// // //     const parts: string[] = [];
+
+// // //     if (data.expenses) parts.push(`${data.expenses.length} expenses`);
+// // //     if (data.monthlyBudget !== undefined) parts.push('the monthly budget');
+// // //     if (data.currency !== undefined) parts.push('the currency');
+// // //     if (data.profile !== undefined) parts.push('your profile');
+// // //     if (data.notes) parts.push(`${data.notes.length} notes`);
+
+// // //     const message = `This will replace your current ${
+// // //       parts.length > 0 ? parts.join(', ') : 'stored data'
+// // //     }. This cannot be undone.`;
+
+// // //     return new Promise((resolve) => {
+// // //       if (Platform.OS === 'web') {
+// // //         resolve(window.confirm(`Import backup?\n\n${message}`));
+// // //         return;
+// // //       }
+
+// // //       Alert.alert('Import backup?', message, [
+// // //         { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+// // //         { text: 'Import', style: 'destructive', onPress: () => resolve(true) },
+// // //       ], {
+// // //         cancelable: true,
+// // //         onDismiss: () => resolve(false),
+// // //       });
+// // //     });
+// // //   };
+
+
+// // // const handleImportData = async () => {
+// // //     setImporting(true);
+
+// // //     try {
+// // //       const result = await DocumentPicker.getDocumentAsync({
+// // //         type: ["application/json", "*/*"],
+// // //         copyToCacheDirectory: false,
+// // //       });
+
+// // //       if (result.canceled || !result.assets[0]) return;
+
+// // //       const fileAsset = result.assets[0];
+// // //       let fileUri = fileAsset.uri;
+
+// // //       // On Android, content:// URIs must be copied to documentDirectory to be readable
+// // //       if (Platform.OS === "android") {
+// // //         const fileName = fileAsset.name || `import_${Date.now()}.json`;
+// // //         const localDestination = `${FileSystem.documentDirectory}${fileName}`;
+
+// // //         const fileInfo = await FileSystem.getInfoAsync(localDestination);
+// // //         if (fileInfo.exists) {
+// // //           await FileSystem.deleteAsync(localDestination);
+// // //         }
+
+// // //         await FileSystem.copyAsync({
+// // //           from: fileUri,
+// // //           to: localDestination,
+// // //         });
+
+// // //         fileUri = localDestination;
+// // //       }
+
+// // //       const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+// // //         encoding: FileSystem.EncodingType.UTF8,
+// // //       });
+
+// // //       let parsedData: unknown;
+// // //       try {
+// // //         parsedData = JSON.parse(fileContent);
+// // //       } catch {
+// // //         throw new Error("The selected file is not valid JSON.");
+// // //       }
+
+// // //       // 1. Validate and normalize the imported data (schema checks & sequential IDs)
+// // //       const data = normalizeImport(parsedData);
+
+// // //       if (!(await confirmImport(data))) return;
+
+// // //       const writes: [string, string][] = [];
+
+// // //       if (data.expenses !== undefined) {
+// // //         writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+// // //       }
+
+// // //       if (data.monthlyBudget !== undefined) {
+// // //         writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
+// // //       }
+
+// // //       if (data.currency !== undefined) {
+// // //         writes.push([STORAGE_KEYS.currency, data.currency]);
+// // //       }
+
+// // //       if (data.profile !== undefined) {
+// // //         writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
+// // //       }
+
+// // //       if (data.firstUsed !== undefined) {
+// // //         writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
+// // //       }
+
+// // //       if (data.notes !== undefined) {
+// // //         writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+// // //       }
+
+// // //       if (writes.length === 0) {
+// // //         throw new Error("The backup does not contain anything to import.");
+// // //       }
+
+// // //       // 2. Save directly to AsyncStorage so all views load the restored data on focus/reload
+// // //       await AsyncStorage.multiSet(writes);
+
+// // //       if (data.currency !== undefined) {
+// // //         setCurrentCurrency(data.currency);
+// // //       }
+
+// // //       notify(
+// // //         "Import complete",
+// // //         "Your backup was restored successfully. Reopen your expense pages to see the updated data."
+// // //       );
+// // //     } catch (error) {
+// // //       console.error("Import failed:", error);
+// // //       notify(
+// // //         "Import failed",
+// // //         error instanceof Error ? error.message : "Unable to read or parse the selected file."
+// // //       );
+// // //     } finally {
+// // //       setImporting(false);
+// // //     }
+// // //   };
+
+  
+
+// // //   return (
+// // //     <ScrollView
+// // //       style={[styles.container, { paddingHorizontal: horizontalPadding }]}
+// // //       contentContainerStyle={styles.scrollContent}
+// // //       showsVerticalScrollIndicator={false}
+// // //     >
+// // //       <View style={styles.contentWrapper}>
+// // //         {/* Header */}
+// // //         <View style={styles.headerContainer}>
+// // //           <View style={{ flex: 1 }}>
+// // //             <Text style={styles.headerTitle}>Settings</Text>
+// // //             <Text style={styles.headerSubtitle}>
+// // //               Manage your currency, backups, and app data.
+// // //             </Text>
+// // //           </View>
+// // //         </View>
+
+// // //         {/* Currency Section */}
+// // //         <View style={styles.sectionCard}>
+// // //           <View style={styles.sectionHeaderRow}>
+// // //             <Text style={styles.sectionTitle}>Default Currency</Text>
+// // //           </View>
+// // //           <Text style={styles.sectionDesc}>
+// // //             Select the currency symbol used across your expenses, budgets, and exports.
+// // //           </Text>
+
+// // //           <Pressable style={styles.comboboxTrigger} onPress={() => setModalVisible(true)}>
+// // //             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+// // //               <Text style={styles.comboboxTriggerText}>{selectedCurrencyObj.label}</Text>
+// // //             </View>
+// // //             <Ionicons name="chevron-down" size={18} color="#6B7280" />
+// // //           </Pressable>
+// // //         </View>
+
+// // //         {/* Backup & Restore Data Section */}
+// // //         <View style={styles.sectionCard}>
+// // //           <View style={styles.sectionHeaderRow}>
+// // //             <Text style={styles.sectionTitle}>Backup & Restore</Text>
+// // //           </View>
+// // //           <Text style={styles.sectionDesc}>
+// // //             Export a complete JSON backup you can import later, or download your expenses as a
+// // //             CSV or Excel spreadsheet. Only JSON backups can be imported.
+// // //           </Text>
+
+// // //           <Pressable 
+// // //             onPress={() => router.push('/landing?scrollTo=import')}
+// // //             style={styles.button}
+// // //           >
+// // //             <Text style={styles.buttonText}>JSON Import Guide</Text>
+// // //           </Pressable>
+
+// // //           <View style={styles.actionButtonsRow}>
+// // //             <Pressable
+// // //               style={[styles.exportButton, exporting && styles.buttonDisabled]}
+// // //               onPress={() => setExportModalVisible(true)}
+// // //               disabled={exporting}
+// // //             >
+// // //               {exporting ? (
+// // //                 <ActivityIndicator color="#FFFFFF" size="small" />
+// // //               ) : (
+// // //                 <Ionicons name="download-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
+// // //               )}
+// // //               <Text style={styles.exportButtonText}>
+// // //                 {exporting ? 'Exporting…' : 'Export Data'}
+// // //               </Text>
+// // //             </Pressable>
+
+// // //             <Pressable
+// // //               style={[styles.importButton, importing && styles.buttonDisabled]}
+// // //               onPress={handleImportData}
+// // //               disabled={importing}
+// // //             >
+// // //               {importing ? (
+// // //                 <ActivityIndicator color="#1F2937" size="small" />
+// // //               ) : (
+// // //                 <Ionicons
+// // //                   name="cloud-upload-outline"
+// // //                   size={18}
+// // //                   color="#1F2937"
+// // //                   style={{ marginRight: 8 }}
+// // //                 />
+// // //               )}
+// // //               <Text style={styles.importButtonText}>
+// // //                 {importing ? 'Importing…' : 'Import JSON'}
+// // //               </Text>
+// // //             </Pressable>
+// // //           </View>
+
+// // //           {/* Cloud & Email Backup Integrations (Cross-Platform) */}
+// // //           <View style={styles.cloudBackupContainer}>
+// // //             <Text style={styles.cloudSubheading}>Cloud & Remote Backup</Text>
+// // //             <View style={styles.cloudButtonsRow}>
+// // //               <Pressable
+// // //                 style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+// // //                 onPress={handleUploadToCloud}
+// // //                 disabled={cloudActionLoading}
+// // //               >
+// // //                 <Ionicons name="globe" size={18} color="#15803D" style={{ marginRight: 6 }} />
+// // //                 <Text style={styles.cloudButtonText}>Save to Cloud</Text>
+// // //               </Pressable>
+
+// // //               <Pressable
+// // //                 style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+// // //                 onPress={handleSendEmailBackup}
+// // //                 disabled={cloudActionLoading}
+// // //               >
+// // //                 <Ionicons name="mail-outline" size={18} color="#1D4ED8" style={{ marginRight: 6 }} />
+// // //                 <Text style={styles.cloudButtonText}>Email Backup</Text>
+// // //               </Pressable>
+// // //             </View>
+// // //           </View>
+
+// // //           <View style={styles.formatNote}>
+// // //             <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
+// // //             <Text style={styles.formatNoteText}>
+// // //               JSON restores everything. CSV and XLS are spreadsheet exports for viewing and
+// // //               reporting.
+// // //             </Text>
+// // //           </View>
+// // //         </View>
+
+// // //         {/* Currency Selection Modal */}
+// // //         <Modal
+// // //           animationType="slide"
+// // //           transparent={true}
+// // //           visible={modalVisible}
+// // //           onRequestClose={() => setModalVisible(false)}
+// // //         >
+// // //           <View style={styles.modalOverlay}>
+// // //             <View style={styles.modalContent}>
+// // //               <View style={styles.modalHeader}>
+// // //                 <Text style={styles.modalHeaderTitle}>Select Currency</Text>
+// // //                 <Pressable
+// // //                   onPress={() => {
+// // //                     setModalVisible(false);
+// // //                     setSearchQuery('');
+// // //                   }}
+// // //                 >
+// // //                   <Ionicons name="close" size={24} color="#111827" />
+// // //                 </Pressable>
+// // //               </View>
+
+// // //               <View style={styles.modalSearchContainer}>
+// // //                 <Ionicons name="search" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+// // //                 <TextInput
+// // //                   style={styles.modalSearchInput}
+// // //                   placeholder="Search currency name or symbol..."
+// // //                   placeholderTextColor="#9CA3AF"
+// // //                   value={searchQuery}
+// // //                   onChangeText={setSearchQuery}
+// // //                   autoFocus
+// // //                 />
+// // //                 {searchQuery.length > 0 && (
+// // //                   <Pressable onPress={() => setSearchQuery('')}>
+// // //                     <Ionicons name="close-circle" size={16} color="#9CA3AF" />
+// // //                   </Pressable>
+// // //                 )}
+// // //               </View>
+
+// // //               <FlatList
+// // //                 data={filteredCurrencies}
+// // //                 keyExtractor={(item) => item.code}
+// // //                 showsVerticalScrollIndicator={false}
+// // //                 contentContainerStyle={{ paddingBottom: 20 }}
+// // //                 renderItem={({ item }) => {
+// // //                   const isSelected = currentCurrency === item.code;
+
+// // //                   return (
+// // //                     <Pressable
+// // //                       style={[
+// // //                         styles.currencyOptionItem,
+// // //                         isSelected && styles.currencyOptionItemActive,
+// // //                       ]}
+// // //                       onPress={() => handleCurrencyChange(item.code, item.label)}
+// // //                     >
+// // //                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+// // //                         <View
+// // //                           style={[
+// // //                             styles.currencySymbolBadge,
+// // //                             isSelected && { backgroundColor: '#E59400' },
+// // //                           ]}
+// // //                         >
+// // //                           <Text
+// // //                             style={[
+// // //                               styles.currencySymbolText,
+// // //                               isSelected && { color: '#FFFFFF' },
+// // //                             ]}
+// // //                           >
+// // //                             {item.symbol}
+// // //                           </Text>
+// // //                         </View>
+// // //                         <Text
+// // //                           style={[
+// // //                             styles.currencyOptionText,
+// // //                             isSelected && { fontWeight: '700', color: '#E59400' },
+// // //                           ]}
+// // //                         >
+// // //                           {item.label}
+// // //                         </Text>
+// // //                       </View>
+// // //                       {isSelected && (
+// // //                         <Ionicons name="checkmark-circle" size={20} color="#E59400" />
+// // //                       )}
+// // //                     </Pressable>
+// // //                   );
+// // //                 }}
+// // //               />
+// // //             </View>
+// // //           </View>
+// // //         </Modal>
+
+// // //         {/* Export Format Modal */}
+// // //         <Modal
+// // //           animationType="slide"
+// // //           transparent={true}
+// // //           visible={exportModalVisible}
+// // //           onRequestClose={() => !exporting && setExportModalVisible(false)}
+// // //         >
+// // //           <View style={styles.modalOverlay}>
+// // //             <View style={styles.exportModalContent}>
+// // //               <View style={styles.modalHeader}>
+// // //                 <Text style={styles.modalHeaderTitle}>Export Data</Text>
+// // //                 <Pressable
+// // //                   onPress={() => setExportModalVisible(false)}
+// // //                   disabled={exporting}
+// // //                 >
+// // //                   <Ionicons name="close" size={24} color="#111827" />
+// // //                 </Pressable>
+// // //               </View>
+
+// // //               <Text style={styles.exportModalSubtitle}>
+// // //                 Choose a format for your expense data.
+// // //               </Text>
+
+// // //               <Pressable
+// // //                 style={styles.exportOption}
+// // //                 onPress={() => handleExportData('json')}
+// // //                 disabled={exporting}
+// // //               >
+// // //                 <View style={[styles.exportOptionIcon, { backgroundColor: '#DCFCE7' }]}>
+// // //                   <Ionicons name="code-slash-outline" size={22} color="#15803D" />
+// // //                 </View>
+// // //                 <View style={styles.exportOptionTextGroup}>
+// // //                   <Text style={styles.exportOptionTitle}>JSON backup</Text>
+// // //                   <Text style={styles.exportOptionDescription}>
+// // //                     Complete backup of expenses, budget, profile, and preferences. Can be
+// // //                     imported again.
+// // //                   </Text>
+// // //                 </View>
+// // //                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+// // //               </Pressable>
+
+// // //               <Pressable
+// // //                 style={styles.exportOption}
+// // //                 onPress={() => handleExportData('csv')}
+// // //                 disabled={exporting}
+// // //               >
+// // //                 <View style={[styles.exportOptionIcon, { backgroundColor: '#DBEAFE' }]}>
+// // //                   <Ionicons name="grid-outline" size={22} color="#1D4ED8" />
+// // //                 </View>
+// // //                 <View style={styles.exportOptionTextGroup}>
+// // //                   <Text style={styles.exportOptionTitle}>CSV (.csv)</Text>
+// // //                   <Text style={styles.exportOptionDescription}>
+// // //                     One row per expense. Opens in Excel, Numbers, and Google Sheets.
+// // //                   </Text>
+// // //                 </View>
+// // //                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+// // //               </Pressable>
+
+// // //               <Pressable
+// // //                 style={styles.exportOption}
+// // //                 onPress={() => handleExportData('xls')}
+// // //                 disabled={exporting}
+// // //               >
+// // //                 <View style={[styles.exportOptionIcon, { backgroundColor: '#FEF3C7' }]}>
+// // //                   <Ionicons name="document-text-outline" size={22} color="#B45309" />
+// // //                 </View>
+// // //                 <View style={styles.exportOptionTextGroup}>
+// // //                   <Text style={styles.exportOptionTitle}>Excel (.xls)</Text>
+// // //                   <Text style={styles.exportOptionDescription}>
+// // //                     Expenses, summary, and profile sheets. Best for reporting.
+// // //                   </Text>
+// // //                 </View>
+// // //                 <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+// // //               </Pressable>
+
+// // //               {exporting && (
+// // //                 <View style={styles.exportingRow}>
+// // //                   <ActivityIndicator color="#1aaa00" />
+// // //                   <Text style={styles.exportingText}>Preparing your file…</Text>
+// // //                 </View>
+// // //               )}
+// // //             </View>
+// // //           </View>
+// // //         </Modal>
+// // //       </View>
+// // //     </ScrollView>
+// // //   );
+// // // }
+
+// // // const styles = StyleSheet.create({
+// // //   button: {
+// // //     backgroundColor: '#111827',
+// // //     paddingHorizontal: 30,
+// // //     paddingVertical: 15,
+// // //     marginBottom: 15, 
+// // //     borderRadius: 10,
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     justifyContent: 'center',
+// // //     alignSelf: 'flex-start',
+// // //     shadowColor: '#000',
+// // //     shadowOffset: { width: 0, height: 2 },
+// // //     shadowOpacity: 0.1,
+// // //     shadowRadius: 3,
+// // //     elevation: 2,
+// // //   },
+// // //   buttonText: {
+// // //     color: '#FFFFFF',
+// // //     fontWeight: '700',
+// // //     fontSize: 15,
+// // //   },
+// // //   container: GlobalStyles.mainContainer,
+// // //   scrollContent: GlobalStyles.scrollContent,
+// // //   contentWrapper: {
+// // //     width: '100%',
+// // //     maxWidth: 900,
+// // //     alignSelf: 'center',
+// // //   },
+// // //   headerContainer: {
+// // //     ...GlobalStyles.headerContainer,
+// // //     marginBottom: 8,
+// // //   } as any,
+// // //   headerTitle: GlobalStyles.pageHeading,
+// // //   headerSubtitle: GlobalStyles.pageSubheading,
+// // //   sectionCard: {
+// // //     backgroundColor: '#FFFFFF',
+// // //     borderRadius: 16,
+// // //     padding: 20,
+// // //     marginBottom: 20,
+// // //     marginTop: 20,
+// // //     borderWidth: 1,
+// // //     borderColor: '#E5E7EB',
+// // //   },
+// // //   sectionHeaderRow: {
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     marginBottom: 6,
+// // //   },
+// // //   sectionTitle: {
+// // //     fontSize: 18,
+// // //     fontWeight: '700',
+// // //     color: '#111827',
+// // //   },
+// // //   sectionDesc: {
+// // //     fontSize: 14,
+// // //     color: '#6B7280',
+// // //     marginBottom: 16,
+// // //     lineHeight: 20,
+// // //   },
+// // //   comboboxTrigger: {
+// // //     flexDirection: 'row',
+// // //     justifyContent: 'space-between',
+// // //     alignItems: 'center',
+// // //     backgroundColor: '#F9FAFB',
+// // //     borderWidth: 1,
+// // //     borderColor: '#E5E7EB',
+// // //     borderRadius: 12,
+// // //     paddingHorizontal: 14,
+// // //     paddingVertical: 12,
+// // //   },
+// // //   comboboxTriggerText: {
+// // //     fontSize: 15,
+// // //     fontWeight: '600',
+// // //     color: '#1F2937',
+// // //   },
+// // //   currencySymbolBadge: {
+// // //     width: 32,
+// // //     height: 32,
+// // //     borderRadius: 8,
+// // //     backgroundColor: '#FEF3C7',
+// // //     justifyContent: 'center',
+// // //     alignItems: 'center',
+// // //     marginRight: 10,
+// // //   },
+// // //   currencySymbolText: {
+// // //     fontSize: 14,
+// // //     fontWeight: 'bold',
+// // //     color: '#D97706',
+// // //   },
+// // //   actionButtonsRow: {
+// // //     flexDirection: 'row',
+// // //     gap: 12,
+// // //   },
+// // //   exportButton: {
+// // //     flex: 1,
+// // //     flexDirection: 'row',
+// // //     justifyContent: 'center',
+// // //     alignItems: 'center',
+// // //     backgroundColor: '#1aaa00',
+// // //     paddingVertical: 14,
+// // //     borderRadius: 12,
+// // //   },
+// // //   exportButtonText: {
+// // //     color: '#FFFFFF',
+// // //     fontWeight: '700',
+// // //     fontSize: 15,
+// // //   },
+// // //   importButton: {
+// // //     flex: 1,
+// // //     flexDirection: 'row',
+// // //     justifyContent: 'center',
+// // //     alignItems: 'center',
+// // //     backgroundColor: '#F3F4F6',
+// // //     paddingVertical: 14,
+// // //     borderRadius: 12,
+// // //     borderWidth: 1,
+// // //     borderColor: '#E5E7EB',
+// // //   },
+// // //   importButtonText: {
+// // //     color: '#1F2937',
+// // //     fontWeight: '700',
+// // //     fontSize: 15,
+// // //   },
+// // //   cloudBackupContainer: {
+// // //     marginTop: 16,
+// // //     paddingTop: 16,
+// // //     borderTopWidth: 1,
+// // //     borderTopColor: '#F3F4F6',
+// // //   },
+// // //   cloudSubheading: {
+// // //     fontSize: 13,
+// // //     fontWeight: '600',
+// // //     color: '#4B5563',
+// // //     marginBottom: 10,
+// // //   },
+// // //   cloudButtonsRow: {
+// // //     flexDirection: 'row',
+// // //     gap: 10,
+// // //   },
+// // //   cloudOptionButton: {
+// // //     flex: 1,
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     justifyContent: 'center',
+// // //     backgroundColor: '#F9FAFB',
+// // //     borderWidth: 1,
+// // //     borderColor: '#E5E7EB',
+// // //     paddingVertical: 10,
+// // //     borderRadius: 10,
+// // //   },
+// // //   cloudButtonText: {
+// // //     fontSize: 13,
+// // //     fontWeight: '600',
+// // //     color: '#374151',
+// // //   },
+// // //   buttonDisabled: {
+// // //     opacity: 0.65,
+// // //   },
+// // //   formatNote: {
+// // //     flexDirection: 'row',
+// // //     alignItems: 'flex-start',
+// // //     gap: 8,
+// // //     marginTop: 14,
+// // //   },
+// // //   formatNoteText: {
+// // //     flex: 1,
+// // //     fontSize: 12,
+// // //     lineHeight: 18,
+// // //     color: '#6B7280',
+// // //   },
+// // //   modalOverlay: {
+// // //     flex: 1,
+// // //     backgroundColor: 'rgba(0,0,0,0.5)',
+// // //     justifyContent: 'flex-end',
+// // //   },
+// // //   modalContent: {
+// // //     backgroundColor: '#FFFFFF',
+// // //     borderTopLeftRadius: 24,
+// // //     borderTopRightRadius: 24,
+// // //     padding: 20,
+// // //     height: '75%',
+// // //   },
+// // //   modalHeader: {
+// // //     flexDirection: 'row',
+// // //     justifyContent: 'space-between',
+// // //     alignItems: 'center',
+// // //     marginBottom: 16,
+// // //   },
+// // //   modalHeaderTitle: {
+// // //     fontSize: 18,
+// // //     fontWeight: 'bold',
+// // //     color: '#111827',
+// // //   },
+// // //   modalSearchContainer: {
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     backgroundColor: '#F9FAFB',
+// // //     borderWidth: 1,
+// // //     borderColor: '#E5E7EB',
+// // //     borderRadius: 10,
+// // //     paddingHorizontal: 12,
+// // //     paddingVertical: 8,
+// // //     marginBottom: 16,
+// // //   },
+// // //   modalSearchInput: {
+// // //     flex: 1,
+// // //     fontSize: 14,
+// // //     color: '#111827',
+// // //     padding: 0,
+// // //     // @ts-ignore
+// // //     outlineStyle: 'none',
+// // //   } as any,
+// // //   currencyOptionItem: {
+// // //     flexDirection: 'row',
+// // //     justifyContent: 'space-between',
+// // //     alignItems: 'center',
+// // //     paddingVertical: 12,
+// // //     paddingHorizontal: 10,
+// // //     borderBottomWidth: 1,
+// // //     borderBottomColor: '#F3F4F6',
+// // //     borderRadius: 8,
+// // //   },
+// // //   currencyOptionItemActive: {
+// // //     backgroundColor: '#FEF3C7',
+// // //   },
+// // //   currencyOptionText: {
+// // //     fontSize: 15,
+// // //     color: '#4B5563',
+// // //     fontWeight: '500',
+// // //   },
+// // //   exportModalContent: {
+// // //     backgroundColor: '#FFFFFF',
+// // //     borderTopLeftRadius: 24,
+// // //     borderTopRightRadius: 24,
+// // //     padding: 20,
+// // //     paddingBottom: 30,
+// // //   },
+// // //   exportModalSubtitle: {
+// // //     fontSize: 14,
+// // //     color: '#6B7280',
+// // //     lineHeight: 20,
+// // //     marginBottom: 12,
+// // //   },
+// // //   exportOption: {
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     gap: 12,
+// // //     paddingVertical: 14,
+// // //     borderBottomWidth: 1,
+// // //     borderBottomColor: '#F3F4F6',
+// // //   },
+// // //   exportOptionIcon: {
+// // //     width: 44,
+// // //     height: 44,
+// // //     borderRadius: 12,
+// // //     justifyContent: 'center',
+// // //     alignItems: 'center',
+// // //   },
+// // //   exportOptionTextGroup: {
+// // //     flex: 1,
+// // //   },
+// // //   exportOptionTitle: {
+// // //     fontSize: 15,
+// // //     fontWeight: '700',
+// // //     color: '#111827',
+// // //   },
+// // //   exportOptionDescription: {
+// // //     fontSize: 12,
+// // //     color: '#6B7280',
+// // //     lineHeight: 17,
+// // //     marginTop: 2,
+// // //   },
+// // //   exportingRow: {
+// // //     flexDirection: 'row',
+// // //     alignItems: 'center',
+// // //     justifyContent: 'center',
+// // //     gap: 10,
+// // //     marginTop: 18,
+// // //   },
+// // //   exportingText: {
+// // //     fontSize: 13,
+// // //     color: '#4B5563',
+// // //     fontWeight: '600',
+// // //   },
+// // // });
+
+
+
+// // // newer
+// // import React, { useEffect, useState } from 'react';
+// // import {
+// //   ActivityIndicator,
+// //   Alert,
+// //   Modal,
+// //   Platform,
+// //   Pressable,
+// //   ScrollView,
+// //   StyleSheet,
+// //   Text,
+// //   TextInput,
+// //   useWindowDimensions,
+// //   View,
+// // } from 'react-native';
+// // import { Ionicons } from '@expo/vector-icons';
+// // import AsyncStorage from '@react-native-async-storage/async-storage';
+// // import * as FileSystem from 'expo-file-system/legacy';
+// // import * as Sharing from 'expo-sharing';
+// // import * as DocumentPicker from 'expo-document-picker';
+// // import * as MailComposer from 'expo-mail-composer';
+// // import Head from 'expo-router/head';
+
+// // import { STORAGE_KEYS } from '@/constants/storage';
+// // import {
+// //   // buildCsv,
+// //   // buildXls,
+// //   createBackupFile,
+// //   isExpense,
+// //   isRecord,
+// //   normalizeImport,
+// //   type BackupData,
+// //   // type ExportFormat,
+// //   type ImportData,
+// // } from '@/utils/dataExport';
+// // import { router } from 'expo-router';
+
+// // // Theme Palette (Matches Notes, Tasks, and Links)
+// // const COLORS = {
+// //   bg: '#0F1115',
+// //   surface: '#1A1D24',
+// //   surfaceElevated: '#242832',
+// //   border: '#2E3340',
+// //   textPrimary: '#FFFFFF',
+// //   textSecondary: '#9CA3AF',
+// //   textMuted: '#6B7280',
+// //   accent: '#F59E0B',
+// //   accentText: '#111827',
+// //   success: '#10B981',
+// //   danger: '#EF4444',
+// // };
+
+// // const parseStoredJson = (raw: string | null): unknown => {
+// //   if (!raw) return null;
+
+// //   try {
+// //     return JSON.parse(raw);
+// //   } catch {
+// //     return null;
+// //   }
+// // };
+
+// // const notify = (title: string, message: string) => {
+// //   if (Platform.OS === 'web') {
+// //     window.alert(`${title}\n\n${message}`);
+// //   } else {
+// //     Alert.alert(title, message);
+// //   }
+// // };
+
+// // export default function SettingsScreen() {
+// //   const { width } = useWindowDimensions();
+// //   const horizontalPadding = width >= 768 ? 40 : 20;
+
+// //   const [usernameInput, setUsernameInput] = useState<string>('');
+// //   const [isSavingUsername, setIsSavingUsername] = useState<boolean>(false);
+
+// //   const [exportModalVisible, setExportModalVisible] = useState<boolean>(false);
+// //   const [exporting, setExporting] = useState<boolean>(false);
+// //   const [importing, setImporting] = useState<boolean>(false);
+// //   const [cloudActionLoading, setCloudActionLoading] = useState<boolean>(false);
+
+// //   useEffect(() => {
+// //     loadSettings();
+// //   }, []);
+
+// //   const loadSettings = async () => {
+// //     try {
+// //       const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+// //       const parsedProfile = parseStoredJson(savedProfileRaw);
+// //       if (isRecord(parsedProfile) && typeof parsedProfile.name === 'string') {
+// //         setUsernameInput(parsedProfile.name);
+// //       }
+// //     } catch (error) {
+// //       console.error('Failed to load settings', error);
+// //     }
+// //   };
+
+// //   const handleSaveUsername = async () => {
+// //     const trimmedName = usernameInput.trim();
+// //     if (!trimmedName) {
+// //       notify('Validation', 'Username cannot be empty.');
+// //       return;
+// //     }
+
+// //     setIsSavingUsername(true);
+// //     try {
+// //       const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+// //       const parsedProfile = isRecord(parseStoredJson(savedProfileRaw))
+// //         ? (parseStoredJson(savedProfileRaw) as Record<string, unknown>)
+// //         : {};
+
+// //       const updatedProfile = { ...parsedProfile, name: trimmedName };
+// //       await AsyncStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(updatedProfile));
+
+// //       notify('Success', 'Username updated successfully.');
+// //     } catch (error) {
+// //       console.error('Failed to save username', error);
+// //       notify('Error', 'Could not save username.');
+// //     } finally {
+// //       setIsSavingUsername(false);
+// //     }
+// //   };
+
+// //   // ----------------------------------
+// //   // Export helpers
+// //   // ----------------------------------
+// //   // const readBackupData = async (): Promise<BackupData> => {
+// //   //   const [
+// //   //     expensesRaw,
+// //   //     budgetRaw,
+// //   //     currencyRaw,
+// //   //     profileRaw,
+// //   //     firstUsedRaw,
+// //   //     seededRaw,
+// //   //     shoppingRaw,
+// //   //     notesRaw,
+// //   //   ] = await Promise.all([
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.expenses),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.monthlyBudget),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.currency),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.profile),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.firstUsed),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.monthlyDummySeeded),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.shoppingLists),
+// //   //     AsyncStorage.getItem(STORAGE_KEYS.notes),
+// //   //   ]);
+
+// //   //   const parsedExpenses = parseStoredJson(expensesRaw);
+// //   //   const parsedBudget = Number(budgetRaw);
+// //   //   const parsedProfile = parseStoredJson(profileRaw);
+// //   //   const parsedNotes = parseStoredJson(notesRaw);
+
+// //   //   return {
+// //   //     expenses: Array.isArray(parsedExpenses)
+// //   //       ? parsedExpenses.filter(isExpense)
+// //   //       : [],
+// //   //     monthlyBudget:
+// //   //       budgetRaw && Number.isFinite(parsedBudget) && parsedBudget > 0
+// //   //         ? parsedBudget
+// //   //         : null,
+// //   //     currency: currencyRaw || null,
+// //   //     profile: isRecord(parsedProfile) ? parsedProfile : null,
+// //   //     firstUsed: firstUsedRaw || null,
+// //   //     monthlyDummySeeded: seededRaw === 'true',
+// //   //     notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+// //   //   };
+// //   // };
+
+
+// //   // newer
+// //   const readBackupData = async (): Promise<BackupData> => {
+// //     const [
+// //       expensesRaw,
+// //       budgetRaw,
+// //       currencyRaw,
+// //       profileRaw,
+// //       firstUsedRaw,
+// //       seededRaw,
+// //       notesRaw,
+// //       tasksRaw,
+// //       linksRaw,
+// //       noteFoldersRaw,
+// //       taskFoldersRaw,
+// //       linkFoldersRaw,
+// //     ] = await Promise.all([
+// //       AsyncStorage.getItem(STORAGE_KEYS.expenses),
+// //       AsyncStorage.getItem(STORAGE_KEYS.monthlyBudget),
+// //       AsyncStorage.getItem(STORAGE_KEYS.currency),
+// //       AsyncStorage.getItem(STORAGE_KEYS.profile),
+// //       AsyncStorage.getItem(STORAGE_KEYS.firstUsed),
+// //       AsyncStorage.getItem(STORAGE_KEYS.monthlyDummySeeded),
+// //       AsyncStorage.getItem(STORAGE_KEYS.notes),
+// //       AsyncStorage.getItem('@tasks_app_data'),
+// //       AsyncStorage.getItem('@links_app_data'),
+// //       AsyncStorage.getItem('@notes_app_folders'),
+// //       AsyncStorage.getItem('@tasks_app_folders'),
+// //       AsyncStorage.getItem('@links_app_folders'),
+// //     ]);
+
+// //     const parsedExpenses = parseStoredJson(expensesRaw);
+// //     const parsedBudget = Number(budgetRaw);
+// //     const parsedProfile = parseStoredJson(profileRaw);
+// //     const parsedNotes = parseStoredJson(notesRaw);
+// //     const parsedTasks = parseStoredJson(tasksRaw);
+// //     const parsedLinks = parseStoredJson(linksRaw);
+// //     const parsedNoteFolders = parseStoredJson(noteFoldersRaw);
+// //     const parsedTaskFolders = parseStoredJson(taskFoldersRaw);
+// //     const parsedLinkFolders = parseStoredJson(linkFoldersRaw);
+
+// //     return {
+// //       expenses: Array.isArray(parsedExpenses) ? parsedExpenses.filter(isExpense) : [],
+// //       monthlyBudget: budgetRaw && Number.isFinite(parsedBudget) && parsedBudget > 0 ? parsedBudget : null,
+// //       currency: currencyRaw || null,
+// //       profile: isRecord(parsedProfile) ? parsedProfile : null,
+// //       firstUsed: firstUsedRaw || null,
+// //       monthlyDummySeeded: seededRaw === 'true',
+// //       notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+// //       tasks: Array.isArray(parsedTasks) ? parsedTasks : [],
+// //       links: Array.isArray(parsedLinks) ? parsedLinks : [],
+// //       noteFolders: Array.isArray(parsedNoteFolders) ? parsedNoteFolders : [],
+// //       taskFolders: Array.isArray(parsedTaskFolders) ? parsedTaskFolders : [],
+// //       linkFolders: Array.isArray(parsedLinkFolders) ? parsedLinkFolders : [],
+// //     };
+// //   };
+
+
+// //   const saveFile = async (
+// //     fileName: string,
+// //     content: string,
+// //     mimeType: string
+// //   ): Promise<void> => {
+// //     if (Platform.OS === 'web') {
+// //       const blob = new Blob([content], { type: mimeType });
+// //       const url = URL.createObjectURL(blob);
+// //       const link = document.createElement('a');
+// //       link.href = url;
+// //       link.download = fileName;
+// //       document.body.appendChild(link);
+// //       link.click();
+// //       document.body.removeChild(link);
+// //       URL.revokeObjectURL(url);
+// //       return;
+// //     }
+
+// //     const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// //     if (!directory) {
+// //       throw new Error('No writable directory is available on this device.');
+// //     }
+
+// //     const fileUri = `${directory}${fileName}`;
+// //     await FileSystem.writeAsStringAsync(fileUri, content, {
+// //       encoding: FileSystem.EncodingType.UTF8,
+// //     });
+
+// //     if (await Sharing.isAvailableAsync()) {
+// //       await Sharing.shareAsync(fileUri, {
+// //         mimeType,
+// //         dialogTitle: 'Export Money Manager data',
+// //       });
+// //     } else {
+// //       notify('Export saved', `The file was saved to ${fileUri}`);
+// //     }
+// //   };
+
+// //   // const handleExportData = async (format: ExportFormat) => {
+// //   //   setExporting(true);
+
+// //   //   try {
+// //   //     const backup = await readBackupData();
+// //   //     const stamp = new Date().toISOString().slice(0, 10);
+
+// //   //     if (format === 'json') {
+// //   //       const file = createBackupFile(backup);
+
+// //   //       await saveFile(
+// //   //         `MoneyManager_Backup_${stamp}.json`,
+// //   //         JSON.stringify(file, null, 2),
+// //   //         'application/json'
+// //   //       );
+// //   //     } else if (format === 'csv') {
+// //   //       await saveFile(
+// //   //         `MoneyManager_Expenses_${stamp}.csv`,
+// //   //         buildCsv(backup.expenses, backup.currency),
+// //   //         'text/csv;charset=utf-8'
+// //   //       );
+// //   //     } else {
+// //   //       await saveFile(
+// //   //         `MoneyManager_Expenses_${stamp}.xls`,
+// //   //         buildXls(backup),
+// //   //         'application/vnd.ms-excel'
+// //   //       );
+// //   //     }
+
+// //   //     setExportModalVisible(false);
+// //   //     notify(
+// //   //       'Export complete',
+// //   //       format === 'json'
+// //   //         ? 'A complete JSON backup was created. Keep it safe — it can be imported later.'
+// //   //         : 'Your expense data was exported as a spreadsheet.'
+// //   //     );
+// //   //   } catch (error) {
+// //   //     console.error('Export failed', error);
+// //   //     notify('Export failed', 'Could not create the export file. Please try again.');
+// //   //   } finally {
+// //   //     setExporting(false);
+// //   //   }
+// //   // };
+
+// //   const handleUploadToCloud = async () => {
+// //     setCloudActionLoading(true);
+// //     try {
+// //       const backup = await readBackupData();
+// //       const stamp = new Date().toISOString().slice(0, 10);
+// //       const fileName = `MoneyManager_Backup_${stamp}.json`;
+// //       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+// //       if (Platform.OS === 'web') {
+// //         const blob = new Blob([content], { type: 'application/json' });
+// //         const url = URL.createObjectURL(blob);
+// //         const link = document.createElement('a');
+// //         link.href = url;
+// //         link.download = fileName;
+// //         document.body.appendChild(link);
+// //         link.click();
+// //         document.body.removeChild(link);
+// //         URL.revokeObjectURL(url);
+// //         notify('Cloud Backup Saved', 'Your JSON backup file has been downloaded.');
+// //       } else {
+// //         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// //         if (!directory) throw new Error('No writable directory available.');
+// //         const fileUri = `${directory}${fileName}`;
+// //         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+// //         if (await Sharing.isAvailableAsync()) {
+// //           await Sharing.shareAsync(fileUri, {
+// //             mimeType: 'application/json',
+// //             dialogTitle: 'Upload Backup to Cloud / Files',
+// //           });
+// //         }
+// //       }
+// //     } catch (error) {
+// //       console.error('Cloud upload failed', error);
+// //       notify('Error', 'Could not prepare backup for cloud upload.');
+// //     } finally {
+// //       setCloudActionLoading(false);
+// //     }
+// //   };
+
+// //   const handleSendEmailBackup = async () => {
+// //     setCloudActionLoading(true);
+// //     try {
+// //       const backup = await readBackupData();
+// //       const stamp = new Date().toISOString().slice(0, 10);
+// //       const fileName = `MoneyManager_Backup_${stamp}.json`;
+// //       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+// //       if (Platform.OS === 'web') {
+// //         const blob = new Blob([content], { type: 'application/json' });
+// //         const url = URL.createObjectURL(blob);
+// //         const link = document.createElement('a');
+// //         link.href = url;
+// //         link.download = fileName;
+// //         document.body.appendChild(link);
+// //         link.click();
+// //         document.body.removeChild(link);
+// //         URL.revokeObjectURL(url);
+
+// //         const subject = encodeURIComponent('Money Manager - JSON Backup');
+// //         const body = encodeURIComponent('Please find your downloaded Money Manager JSON backup file attached.');
+// //         window.location.href = `mailto:?subject=${subject}&body=${body}`;
+// //         notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your email.');
+// //       } else {
+// //         const isAvailable = await MailComposer.isAvailableAsync();
+// //         if (!isAvailable) {
+// //           notify('Email Unavailable', 'This device is not configured to send emails.');
+// //           return;
+// //         }
+
+// //         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+// //         if (!directory) throw new Error('No writable directory available.');
+// //         const fileUri = `${directory}${fileName}`;
+// //         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+// //         await MailComposer.composeAsync({
+// //           subject: 'Money Manager - Automated JSON Backup',
+// //           body: 'Attached is your latest JSON backup file for Money Manager.',
+// //           attachments: [fileUri],
+// //         });
+// //       }
+// //     } catch (error) {
+// //       console.error('Email backup failed', error);
+// //       notify('Error', 'Could not open email composer.');
+// //     } finally {
+// //       setCloudActionLoading(false);
+// //     }
+// //   };
+
+// //   const confirmImport = (data: ImportData): Promise<boolean> => {
+// //     // const parts: string[] = [];
+
+// //     // if (data.expenses) parts.push(`${data.expenses.length} expenses`);
+// //     // if (data.monthlyBudget !== undefined) parts.push('the monthly budget');
+// //     // if (data.currency !== undefined) parts.push('the currency');
+// //     // if (data.profile !== undefined) parts.push('your profile');
+// //     // if (data.notes) parts.push(`${data.notes.length} notes`);
+
+// //     const writes: [string, string][] = [];
+
+// //       if (data.expenses !== undefined) writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+// //       if (data.monthlyBudget !== undefined) writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
+// //       if (data.currency !== undefined) writes.push([STORAGE_KEYS.currency, data.currency]);
+// //       if (data.profile !== undefined) writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
+// //       if (data.firstUsed !== undefined) writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
+// //       if (data.notes !== undefined) writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+// //       if (data.tasks !== undefined) writes.push(['@tasks_app_data', JSON.stringify(data.tasks)]);
+// //       if (data.links !== undefined) writes.push(['@links_app_data', JSON.stringify(data.links)]);
+// //       if (data.noteFolders !== undefined) writes.push(['@notes_app_folders', JSON.stringify(data.noteFolders)]);
+// //       if (data.taskFolders !== undefined) writes.push(['@tasks_app_folders', JSON.stringify(data.taskFolders)]);
+// //       if (data.linkFolders !== undefined) writes.push(['@links_app_folders', JSON.stringify(data.linkFolders)]);
+
+
+// //     const message = `This will replace your current ${
+// //       // parts.length > 0 ? parts.join(', ') : 'stored data'
+// //       writes.length > 0 ? writes.join(', ') : 'stored data'
+
+// //     }. This cannot be undone.`;
+
+// //     return new Promise((resolve) => {
+// //       if (Platform.OS === 'web') {
+// //         resolve(window.confirm(`Import backup?\n\n${message}`));
+// //         return;
+// //       }
+
+// //       Alert.alert('Import backup?', message, [
+// //         { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+// //         { text: 'Import', style: 'destructive', onPress: () => resolve(true) },
+// //       ], {
+// //         cancelable: true,
+// //         onDismiss: () => resolve(false),
+// //       });
+// //     });
+// //   };
+
+// //   const handleImportData = async () => {
+// //     setImporting(true);
+
+// //     try {
+// //       const result = await DocumentPicker.getDocumentAsync({
+// //         type: ["application/json", "*/*"],
+// //         copyToCacheDirectory: false,
+// //       });
+
+// //       if (result.canceled || !result.assets[0]) return;
+
+// //       const fileAsset = result.assets[0];
+// //       let fileUri = fileAsset.uri;
+
+// //       if (Platform.OS === "android") {
+// //         const fileName = fileAsset.name || `import_${Date.now()}.json`;
+// //         const localDestination = `${FileSystem.documentDirectory}${fileName}`;
+
+// //         const fileInfo = await FileSystem.getInfoAsync(localDestination);
+// //         if (fileInfo.exists) {
+// //           await FileSystem.deleteAsync(localDestination);
+// //         }
+
+// //         await FileSystem.copyAsync({
+// //           from: fileUri,
+// //           to: localDestination,
+// //         });
+
+// //         fileUri = localDestination;
+// //       }
+
+// //       const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+// //         encoding: FileSystem.EncodingType.UTF8,
+// //       });
+
+// //       let parsedData: unknown;
+// //       try {
+// //         parsedData = JSON.parse(fileContent);
+// //       } catch {
+// //         throw new Error("The selected file is not valid JSON.");
+// //       }
+
+// //       const data = normalizeImport(parsedData);
+
+// //       if (!(await confirmImport(data))) return;
+
+// //       const writes: [string, string][] = [];
+
+// //       if (data.expenses !== undefined) {
+// //         writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+// //       }
+
+// //       if (data.monthlyBudget !== undefined) {
+// //         writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
+// //       }
+
+// //       if (data.currency !== undefined) {
+// //         writes.push([STORAGE_KEYS.currency, data.currency]);
+// //       }
+
+// //       if (data.profile !== undefined) {
+// //         writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
+// //       }
+
+// //       if (data.firstUsed !== undefined) {
+// //         writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
+// //       }
+
+// //       if (data.notes !== undefined) {
+// //         writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+// //       }
+
+// //       if (writes.length === 0) {
+// //         throw new Error("The backup does not contain anything to import.");
+// //       }
+
+// //       await AsyncStorage.multiSet(writes);
+
+// //       notify(
+// //         "Import complete",
+// //         "Your backup was restored successfully."
+// //       );
+// //     } catch (error) {
+// //       console.error("Import failed:", error);
+// //       notify(
+// //         "Import failed",
+// //         error instanceof Error ? error.message : "Unable to read or parse the selected file."
+// //       );
+// //     } finally {
+// //       setImporting(false);
+// //     }
+// //   };
+
+// //   return (
+// //     <>
+// //       <Head>
+// //         <title>Settings | Money Manager</title>
+// //       </Head>
+
+// //       <ScrollView
+// //         style={[styles.container, { paddingHorizontal: horizontalPadding }]}
+// //         contentContainerStyle={styles.scrollContent}
+// //         showsVerticalScrollIndicator={false}
+// //       >
+// //         <View style={styles.contentWrapper}>
+// //           {/* Header */}
+// //           <View style={styles.headerContainer}>
+// //             <View style={{ flex: 1 }}>
+// //               <Text style={styles.headerTitle}>Settings</Text>
+// //               <Text style={styles.headerSubtitle}>
+// //                 Manage your profile, backups, and app data.
+// //               </Text>
+// //             </View>
+// //           </View>
+
+// //           {/* Profile / Username Section */}
+// //           <View style={styles.sectionCard}>
+// //             <View style={styles.sectionHeaderRow}>
+// //               <Text style={styles.sectionTitle}>Profile Username</Text>
+// //             </View>
+// //             <Text style={styles.sectionDesc}>
+// //               Set or update your display name used across your personal profile and notes.
+// //             </Text>
+
+// //             <View style={styles.usernameInputRow}>
+// //               <TextInput
+// //                 style={styles.inputTitle}
+// //                 placeholder="Enter your username..."
+// //                 placeholderTextColor={COLORS.textMuted}
+// //                 value={usernameInput}
+// //                 onChangeText={setUsernameInput}
+// //               />
+// //               <Pressable
+// //                 style={[styles.saveUsernameButton, isSavingUsername && styles.buttonDisabled]}
+// //                 onPress={handleSaveUsername}
+// //                 disabled={isSavingUsername}
+// //               >
+// //                 {isSavingUsername ? (
+// //                   <ActivityIndicator color={COLORS.accentText} size="small" />
+// //                 ) : (
+// //                   <Text style={styles.saveUsernameButtonText}>Save</Text>
+// //                 )}
+// //               </Pressable>
+// //             </View>
+// //           </View>
+
+// //           {/* Backup & Restore Data Section */}
+// //           <View style={styles.sectionCard}>
+// //             <View style={styles.sectionHeaderRow}>
+// //               <Text style={styles.sectionTitle}>Backup & Restore</Text>
+// //             </View>
+// //             <Text style={styles.sectionDesc}>
+// //               Export a complete JSON backup you can import later, or download your expenses as a
+// //               CSV or Excel spreadsheet. Only JSON backups can be imported.
+// //             </Text>
+
+// //             <Pressable
+// //               onPress={() => router.push('/landing?scrollTo=import' as any)}
+// //               style={styles.guideButton}
+// //             >
+// //               <Text style={styles.guideButtonText}>JSON Import Guide</Text>
+// //             </Pressable>
+
+// //             <View style={styles.actionButtonsRow}>
+// //               <Pressable
+// //                 style={[styles.exportButton, exporting && styles.buttonDisabled]}
+// //                 onPress={() => setExportModalVisible(true)}
+// //                 disabled={exporting}
+// //               >
+// //                 {exporting ? (
+// //                   <ActivityIndicator color={COLORS.accentText} size="small" />
+// //                 ) : (
+// //                   <Ionicons name="download-outline" size={18} color={COLORS.accentText} style={{ marginRight: 8 }} />
+// //                 )}
+// //                 <Text style={styles.exportButtonText}>
+// //                   {exporting ? 'Exporting…' : 'Export Data'}
+// //                 </Text>
+// //               </Pressable>
+
+// //               <Pressable
+// //                 style={[styles.importButton, importing && styles.buttonDisabled]}
+// //                 onPress={handleImportData}
+// //                 disabled={importing}
+// //               >
+// //                 {importing ? (
+// //                   <ActivityIndicator color={COLORS.textPrimary} size="small" />
+// //                 ) : (
+// //                   <Ionicons
+// //                     name="cloud-upload-outline"
+// //                     size={18}
+// //                     color={COLORS.textPrimary}
+// //                     style={{ marginRight: 8 }}
+// //                   />
+// //                 )}
+// //                 <Text style={styles.importButtonText}>
+// //                   {importing ? 'Importing…' : 'Import JSON'}
+// //                 </Text>
+// //               </Pressable>
+// //             </View>
+
+// //             {/* Cloud & Email Backup Integrations */}
+// //             <View style={styles.cloudBackupContainer}>
+// //               <Text style={styles.cloudSubheading}>Cloud & Remote Backup</Text>
+// //               <View style={styles.cloudButtonsRow}>
+// //                 <Pressable
+// //                   style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+// //                   onPress={handleUploadToCloud}
+// //                   disabled={cloudActionLoading}
+// //                 >
+// //                   <Ionicons name="globe" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+// //                   <Text style={styles.cloudButtonText}>Save to Cloud</Text>
+// //                 </Pressable>
+
+// //                 <Pressable
+// //                   style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+// //                   onPress={handleSendEmailBackup}
+// //                   disabled={cloudActionLoading}
+// //                 >
+// //                   <Ionicons name="mail-outline" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+// //                   <Text style={styles.cloudButtonText}>Email Backup</Text>
+// //                 </Pressable>
+// //               </View>
+// //             </View>
+
+// //             <View style={styles.formatNote}>
+// //               <Ionicons name="information-circle-outline" size={16} color={COLORS.textSecondary} />
+// //               <Text style={styles.formatNoteText}>
+// //                 JSON restores everything. CSV and XLS are spreadsheet exports for reporting.
+// //               </Text>
+// //             </View>
+// //           </View>
+
+// //           {/* Export Format Modal */}
+// //           <Modal
+// //             animationType="fade"
+// //             transparent={true}
+// //             visible={exportModalVisible}
+// //             onRequestClose={() => !exporting && setExportModalVisible(false)}
+// //           >
+// //             <View style={styles.modalOverlay}>
+// //               <Pressable style={styles.modalBackdrop} onPress={() => !exporting && setExportModalVisible(false)} />
+
+// //               <View style={styles.modalContent}>
+// //                 <View style={styles.modalHeader}>
+// //                   <Text style={styles.modalHeaderTitle}>Export Data</Text>
+// //                   <Pressable
+// //                     onPress={() => setExportModalVisible(false)}
+// //                     disabled={exporting}
+// //                   >
+// //                     <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+// //                   </Pressable>
+// //                 </View>
+
+// //                 <Text style={styles.exportModalSubtitle}>
+// //                   Choose a format for your expense data.
+// //                 </Text>
+
+// //                 <Pressable
+// //                   style={styles.exportOption}
+// //                   // onPress={() => handleExportData('json')}
+// //                   disabled={exporting}
+// //                 >
+// //                   <View style={[styles.exportOptionIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+// //                     <Ionicons name="code-slash-outline" size={22} color={COLORS.success} />
+// //                   </View>
+// //                   <View style={styles.exportOptionTextGroup}>
+// //                     <Text style={styles.exportOptionTitle}>JSON backup</Text>
+// //                     <Text style={styles.exportOptionDescription}>
+// //                       Complete backup of expenses, budget, profile, and preferences. Can be imported again.
+// //                     </Text>
+// //                   </View>
+// //                   <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
+// //                 </Pressable>
+
+// //                 <Pressable
+// //                   style={styles.exportOption}
+// //                   // onPress={() => handleExportData('csv')}
+// //                   disabled={exporting}
+// //                 >
+// //                   <View style={[styles.exportOptionIcon, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+// //                     <Ionicons name="grid-outline" size={22} color="#60A5FA" />
+// //                   </View>
+// //                   <View style={styles.exportOptionTextGroup}>
+// //                     <Text style={styles.exportOptionTitle}>CSV (.csv)</Text>
+// //                     <Text style={styles.exportOptionDescription}>
+// //                       One row per expense. Opens in Excel, Numbers, and Google Sheets.
+// //                     </Text>
+// //                   </View>
+// //                   <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
+// //                 </Pressable>
+
+// //                 <Pressable
+// //                   style={styles.exportOption}
+// //                   // onPress={() => handleExportData('xls')}
+// //                   disabled={exporting}
+// //                 >
+// //                   <View style={[styles.exportOptionIcon, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+// //                     <Ionicons name="document-text-outline" size={22} color={COLORS.accent} />
+// //                   </View>
+// //                   <View style={styles.exportOptionTextGroup}>
+// //                     <Text style={styles.exportOptionTitle}>Excel (.xls)</Text>
+// //                     <Text style={styles.exportOptionDescription}>
+// //                       Expenses, summary, and profile sheets. Best for reporting.
+// //                     </Text>
+// //                   </View>
+// //                   <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
+// //                 </Pressable>
+
+// //                 {exporting && (
+// //                   <View style={styles.exportingRow}>
+// //                     <ActivityIndicator color={COLORS.accent} />
+// //                     <Text style={styles.exportingText}>Preparing your file…</Text>
+// //                   </View>
+// //                 )}
+// //               </View>
+// //             </View>
+// //           </Modal>
+// //         </View>
+// //       </ScrollView>
+// //     </>
+// //   );
+// // }
+
+// // const styles = StyleSheet.create({
+// //   container: {
+// //     flex: 1,
+// //     backgroundColor: COLORS.bg,
+// //   },
+// //   scrollContent: {
+// //     paddingTop: 24,
+// //     paddingBottom: 110,
+// //   },
+// //   contentWrapper: {
+// //     width: '100%',
+// //     maxWidth: 800,
+// //     alignSelf: 'center',
+// //   },
+// //   headerContainer: {
+// //     marginBottom: 20,
+// //   },
+// //   headerTitle: {
+// //     fontSize: 28,
+// //     fontWeight: '800',
+// //     color: COLORS.textPrimary,
+// //   },
+// //   headerSubtitle: {
+// //     fontSize: 14,
+// //     color: COLORS.textSecondary,
+// //     marginTop: 4,
+// //   },
+// //   sectionCard: {
+// //     backgroundColor: COLORS.surface,
+// //     borderRadius: 16,
+// //     padding: 20,
+// //     marginBottom: 20,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //   },
+// //   sectionHeaderRow: {
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     marginBottom: 6,
+// //   },
+// //   sectionTitle: {
+// //     fontSize: 18,
+// //     fontWeight: '700',
+// //     color: COLORS.textPrimary,
+// //   },
+// //   sectionDesc: {
+// //     fontSize: 14,
+// //     color: COLORS.textSecondary,
+// //     marginBottom: 16,
+// //     lineHeight: 20,
+// //   },
+// //   usernameInputRow: {
+// //     flexDirection: 'row',
+// //     gap: 10,
+// //     alignItems: 'center',
+// //   },
+// //   inputTitle: {
+// //     flex: 1,
+// //     backgroundColor: COLORS.surfaceElevated,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //     borderRadius: 10,
+// //     paddingHorizontal: 14,
+// //     paddingVertical: 12,
+// //     fontSize: 15,
+// //     fontWeight: '600',
+// //     color: COLORS.textPrimary,
+// //     ...Platform.select({
+// //       web: {
+// //         outlineStyle: 'none',
+// //       } as any,
+// //     }),
+// //   },
+// //   saveUsernameButton: {
+// //     backgroundColor: COLORS.accent,
+// //     paddingHorizontal: 20,
+// //     paddingVertical: 12,
+// //     borderRadius: 10,
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //   },
+// //   saveUsernameButtonText: {
+// //     color: COLORS.accentText,
+// //     fontWeight: '800',
+// //     fontSize: 15,
+// //   },
+// //   guideButton: {
+// //     backgroundColor: COLORS.surfaceElevated,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //     paddingHorizontal: 20,
+// //     paddingVertical: 12,
+// //     marginBottom: 16,
+// //     borderRadius: 10,
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     justifyContent: 'center',
+// //     alignSelf: 'flex-start',
+// //   },
+// //   guideButtonText: {
+// //     color: COLORS.textPrimary,
+// //     fontWeight: '700',
+// //     fontSize: 14,
+// //   },
+// //   actionButtonsRow: {
+// //     flexDirection: 'row',
+// //     gap: 12,
+// //   },
+// //   exportButton: {
+// //     flex: 1,
+// //     flexDirection: 'row',
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //     backgroundColor: COLORS.accent,
+// //     paddingVertical: 14,
+// //     borderRadius: 12,
+// //   },
+// //   exportButtonText: {
+// //     color: COLORS.accentText,
+// //     fontWeight: '800',
+// //     fontSize: 15,
+// //   },
+// //   importButton: {
+// //     flex: 1,
+// //     flexDirection: 'row',
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //     backgroundColor: COLORS.surfaceElevated,
+// //     paddingVertical: 14,
+// //     borderRadius: 12,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //   },
+// //   importButtonText: {
+// //     color: COLORS.textPrimary,
+// //     fontWeight: '700',
+// //     fontSize: 15,
+// //   },
+// //   buttonDisabled: {
+// //     opacity: 0.6,
+// //   },
+// //   cloudBackupContainer: {
+// //     marginTop: 16,
+// //     paddingTop: 16,
+// //     borderTopWidth: 1,
+// //     borderTopColor: COLORS.border,
+// //   },
+// //   cloudSubheading: {
+// //     fontSize: 13,
+// //     fontWeight: '600',
+// //     color: COLORS.textSecondary,
+// //     marginBottom: 10,
+// //   },
+// //   cloudButtonsRow: {
+// //     flexDirection: 'row',
+// //     gap: 10,
+// //   },
+// //   cloudOptionButton: {
+// //     flex: 1,
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     justifyContent: 'center',
+// //     backgroundColor: COLORS.surfaceElevated,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //     paddingVertical: 12,
+// //     borderRadius: 10,
+// //   },
+// //   cloudButtonText: {
+// //     fontSize: 13,
+// //     fontWeight: '700',
+// //     color: COLORS.textPrimary,
+// //   },
+// //   formatNote: {
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     marginTop: 16,
+// //     gap: 6,
+// //   },
+// //   formatNoteText: {
+// //     fontSize: 12,
+// //     color: COLORS.textMuted,
+// //     flex: 1,
+// //   },
+// //   modalOverlay: {
+// //     flex: 1,
+// //     backgroundColor: 'rgba(0, 0, 0, 0.75)',
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //     padding: 20,
+// //   },
+// //   modalBackdrop: {
+// //     ...StyleSheet.absoluteFill,
+// //   },
+// //   modalContent: {
+// //     backgroundColor: COLORS.surface,
+// //     borderRadius: 20,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //     padding: 22,
+// //     width: '100%',
+// //     maxWidth: 540,
+// //     shadowColor: '#000',
+// //     shadowOffset: { width: 0, height: 10 },
+// //     shadowOpacity: 0.4,
+// //     shadowRadius: 20,
+// //     elevation: 10,
+// //   },
+// //   modalHeader: {
+// //     flexDirection: 'row',
+// //     justifyContent: 'space-between',
+// //     alignItems: 'center',
+// //     marginBottom: 8,
+// //   },
+// //   modalHeaderTitle: {
+// //     fontSize: 20,
+// //     fontWeight: '800',
+// //     color: COLORS.textPrimary,
+// //   },
+// //   exportModalSubtitle: {
+// //     fontSize: 14,
+// //     color: COLORS.textSecondary,
+// //     marginBottom: 16,
+// //   },
+// //   exportOption: {
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     backgroundColor: COLORS.surfaceElevated,
+// //     borderWidth: 1,
+// //     borderColor: COLORS.border,
+// //     padding: 14,
+// //     borderRadius: 12,
+// //     marginBottom: 10,
+// //   },
+// //   exportOptionIcon: {
+// //     width: 40,
+// //     height: 40,
+// //     borderRadius: 10,
+// //     alignItems: 'center',
+// //     justifyContent: 'center',
+// //     marginRight: 14,
+// //   },
+// //   exportOptionTextGroup: {
+// //     flex: 1,
+// //     paddingRight: 10,
+// //   },
+// //   exportOptionTitle: {
+// //     fontSize: 15,
+// //     fontWeight: '700',
+// //     color: COLORS.textPrimary,
+// //     marginBottom: 2,
+// //   },
+// //   exportOptionDescription: {
+// //     fontSize: 12,
+// //     color: COLORS.textSecondary,
+// //     lineHeight: 16,
+// //   },
+// //   exportingRow: {
+// //     flexDirection: 'row',
+// //     alignItems: 'center',
+// //     justifyContent: 'center',
+// //     marginTop: 14,
+// //     gap: 10,
+// //   },
+// //   exportingText: {
+// //     fontSize: 14,
+// //     color: COLORS.textSecondary,
+// //     fontWeight: '600',
+// //   },
+// // });
+
+
+
+// // newet2
+// import React, { useEffect, useState } from 'react';
+// import {
+//   ActivityIndicator,
+//   Alert,
+//   Modal,
+//   Platform,
+//   Pressable,
+//   ScrollView,
+//   StyleSheet,
+//   Text,
+//   TextInput,
+//   useWindowDimensions,
+//   View,
+// } from 'react-native';
+// import { Ionicons } from '@expo/vector-icons';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import * as FileSystem from 'expo-file-system/legacy';
+// import * as Sharing from 'expo-sharing';
+// import * as DocumentPicker from 'expo-document-picker';
+// import * as MailComposer from 'expo-mail-composer';
+// import Head from 'expo-router/head';
+
+// import { STORAGE_KEYS } from '@/constants/storage';
+// import {
+//   createBackupFile,
+//   isExpense,
+//   isRecord,
+//   normalizeImport,
+//   type BackupData,
+//   type ImportData,
+// } from '@/utils/dataExport';
+// import { router } from 'expo-router';
+
+// // Theme Palette (Matches Notes, Tasks, and Links)
+// const COLORS = {
+//   bg: '#0F1115',
+//   surface: '#1A1D24',
+//   surfaceElevated: '#242832',
+//   border: '#2E3340',
+//   textPrimary: '#FFFFFF',
+//   textSecondary: '#9CA3AF',
+//   textMuted: '#6B7280',
+//   accent: '#F59E0B',
+//   accentText: '#111827',
+//   success: '#10B981',
+//   danger: '#EF4444',
+// };
+
+// const parseStoredJson = (raw: string | null): unknown => {
+//   if (!raw) return null;
+//   try {
+//     return JSON.parse(raw);
+//   } catch {
+//     return null;
+//   }
+// };
+
+// const notify = (title: string, message: string) => {
+//   if (Platform.OS === 'web') {
+//     window.alert(`${title}\n\n${message}`);
+//   } else {
+//     Alert.alert(title, message);
+//   }
+// };
+
+// interface ExportSummaryStats {
+//   expenses: number;
+//   notes: number;
+//   tasks: number;
+//   links: number;
+//   folders: number;
+// }
+
+// export default function SettingsScreen() {
+//   const { width } = useWindowDimensions();
+//   const horizontalPadding = width >= 768 ? 40 : 20;
+
+//   const [usernameInput, setUsernameInput] = useState<string>('');
+//   const [isSavingUsername, setIsSavingUsername] = useState<boolean>(false);
+
+//   const [exporting, setExporting] = useState<boolean>(false);
+//   const [importing, setImporting] = useState<boolean>(false);
+//   const [cloudActionLoading, setCloudActionLoading] = useState<boolean>(false);
+
+//   // Success Summary Modal State
+//   const [summaryModalVisible, setSummaryModalVisible] = useState<boolean>(false);
+//   const [exportStats, setExportStats] = useState<ExportSummaryStats>({
+//     expenses: 0,
+//     notes: 0,
+//     tasks: 0,
+//     links: 0,
+//     folders: 0,
+//   });
+
+//   useEffect(() => {
+//     loadSettings();
+//   }, []);
+
+//   const loadSettings = async () => {
+//     try {
+//       const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+//       const parsedProfile = parseStoredJson(savedProfileRaw);
+//       if (isRecord(parsedProfile) && typeof parsedProfile.name === 'string') {
+//         setUsernameInput(parsedProfile.name);
+//       }
+//     } catch (error) {
+//       console.error('Failed to load settings', error);
+//     }
+//   };
+
+//   const handleSaveUsername = async () => {
+//     const trimmedName = usernameInput.trim();
+//     if (!trimmedName) {
+//       notify('Validation', 'Username cannot be empty.');
+//       return;
+//     }
+
+//     setIsSavingUsername(true);
+//     try {
+//       const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+//       const parsedProfile = isRecord(parseStoredJson(savedProfileRaw))
+//         ? (parseStoredJson(savedProfileRaw) as Record<string, unknown>)
+//         : {};
+
+//       const updatedProfile = { ...parsedProfile, name: trimmedName };
+//       await AsyncStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(updatedProfile));
+
+//       notify('Success', 'Username updated successfully.');
+//     } catch (error) {
+//       console.error('Failed to save username', error);
+//       notify('Error', 'Could not save username.');
+//     } finally {
+//       setIsSavingUsername(false);
+//     }
+//   };
+
+//   // const readBackupData = async (): Promise<BackupData> => {
+//   //   const [
+//   //     expensesRaw,
+//   //     budgetRaw,
+//   //     currencyRaw,
+//   //     profileRaw,
+//   //     firstUsedRaw,
+//   //     seededRaw,
+//   //     notesRaw,
+//   //     tasksRaw,
+//   //     linksRaw,
+//   //     noteFoldersRaw,
+//   //     taskFoldersRaw,
+//   //     linkFoldersRaw,
+//   //   ] = await Promise.all([
+//   //     AsyncStorage.getItem(STORAGE_KEYS.expenses),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.monthlyBudget),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.currency),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.profile),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.firstUsed),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.monthlyDummySeeded),
+//   //     AsyncStorage.getItem(STORAGE_KEYS.notes),
+//   //     AsyncStorage.getItem('@tasks_app_data'),
+//   //     AsyncStorage.getItem('@links_app_data'),
+//   //     AsyncStorage.getItem('@notes_app_folders'),
+//   //     AsyncStorage.getItem('@tasks_app_folders'),
+//   //     AsyncStorage.getItem('@links_app_folders'),
+//   //   ]);
+
+//   //   const parsedExpenses = parseStoredJson(expensesRaw);
+//   //   const parsedBudget = Number(budgetRaw);
+//   //   const parsedProfile = parseStoredJson(profileRaw);
+//   //   const parsedNotes = parseStoredJson(notesRaw);
+//   //   const parsedTasks = parseStoredJson(tasksRaw);
+//   //   const parsedLinks = parseStoredJson(linksRaw);
+//   //   const parsedNoteFolders = parseStoredJson(noteFoldersRaw);
+//   //   const parsedTaskFolders = parseStoredJson(taskFoldersRaw);
+//   //   const parsedLinkFolders = parseStoredJson(linkFoldersRaw);
+
+//   //   return {
+//   //     expenses: Array.isArray(parsedExpenses) ? parsedExpenses.filter(isExpense) : [],
+//   //     monthlyBudget: budgetRaw && Number.isFinite(parsedBudget) && parsedBudget > 0 ? parsedBudget : null,
+//   //     currency: currencyRaw || null,
+//   //     profile: isRecord(parsedProfile) ? parsedProfile : null,
+//   //     firstUsed: firstUsedRaw || null,
+//   //     monthlyDummySeeded: seededRaw === 'true',
+//   //     notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+//   //     tasks: Array.isArray(parsedTasks) ? parsedTasks : [],
+//   //     links: Array.isArray(parsedLinks) ? parsedLinks : [],
+//   //     noteFolders: Array.isArray(parsedNoteFolders) ? parsedNoteFolders : [],
+//   //     taskFolders: Array.isArray(parsedTaskFolders) ? parsedTaskFolders : [],
+//   //     linkFolders: Array.isArray(parsedLinkFolders) ? parsedLinkFolders : [],
+//   //   };
+//   // };
+
+
+// // ddd
+// const readBackupData = async (): Promise<BackupData> => {
+//     const [
+//       profileRaw,
+//       notesRaw,
+//       tasksRaw,
+//       linksRaw,
+//       noteFoldersRaw,
+//       taskFoldersRaw,
+//       linkFoldersRaw,
+//     ] = await Promise.all([
+//       AsyncStorage.getItem(STORAGE_KEYS.profile),
+//       AsyncStorage.getItem(STORAGE_KEYS.notes),
+//       AsyncStorage.getItem('@tasks_app_data'),
+//       AsyncStorage.getItem('@links_app_data'),
+//       AsyncStorage.getItem('@notes_app_folders'),
+//       AsyncStorage.getItem('@tasks_app_folders'),
+//       AsyncStorage.getItem('@links_app_folders'),
+//     ]);
+
+//     const parsedProfile = parseStoredJson(profileRaw);
+//     const username = isRecord(parsedProfile) && typeof parsedProfile.name === 'string' ? parsedProfile.name : null;
+
+//     const parsedNotes = parseStoredJson(notesRaw);
+//     const parsedTasks = parseStoredJson(tasksRaw);
+//     const parsedLinks = parseStoredJson(linksRaw);
+//     const parsedNoteFolders = parseStoredJson(noteFoldersRaw);
+//     const parsedTaskFolders = parseStoredJson(taskFoldersRaw);
+//     const parsedLinkFolders = parseStoredJson(linkFoldersRaw);
+
+//     return {
+//       username,
+//       notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+//       tasks: Array.isArray(parsedTasks) ? parsedTasks : [],
+//       links: Array.isArray(parsedLinks) ? parsedLinks : [],
+//       noteFolders: Array.isArray(parsedNoteFolders) ? parsedNoteFolders : [],
+//       taskFolders: Array.isArray(parsedTaskFolders) ? parsedTaskFolders : [],
+//       linkFolders: Array.isArray(parsedLinkFolders) ? parsedLinkFolders : [],
+//     };
+//   };
+
+//   const saveFile = async (
+//     fileName: string,
+//     content: string,
+//     mimeType: string
+//   ): Promise<void> => {
+//     if (Platform.OS === 'web') {
+//       const blob = new Blob([content], { type: mimeType });
+//       const url = URL.createObjectURL(blob);
+//       const link = document.createElement('a');
+//       link.href = url;
+//       link.download = fileName;
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//       URL.revokeObjectURL(url);
+//       return;
+//     }
+
+//     const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+//     if (!directory) {
+//       throw new Error('No writable directory is available on this device.');
+//     }
+
+//     const fileUri = `${directory}${fileName}`;
+//     await FileSystem.writeAsStringAsync(fileUri, content, {
+//       encoding: FileSystem.EncodingType.UTF8,
+//     });
+
+//     if (await Sharing.isAvailableAsync()) {
+//       await Sharing.shareAsync(fileUri, {
+//         mimeType,
+//         dialogTitle: 'Export Money Manager data',
+//       });
+//     } else {
+//       notify('Export saved', `The file was saved to ${fileUri}`);
+//     }
+//   };
+
+//   // const handleExportJson = async () => {
+//   //   setExporting(true);
+
+//   //   try {
+//   //     const backup = await readBackupData();
+//   //     const stamp = new Date().toISOString().slice(0, 10);
+//   //     const file = createBackupFile(backup);
+
+//   //     await saveFile(
+//   //       `MoneyManager_Backup_${stamp}.json`,
+//   //       JSON.stringify(file, null, 2),
+//   //       'application/json'
+//   //     );
+
+//   //     // Populate summary stats and open success modal
+//   //     const totalFolders =
+//   //       backup.noteFolders.length +
+//   //       backup.taskFolders.length +
+//   //       backup.linkFolders.length;
+
+//   //     setExportStats({
+//   //       expenses: backup.expenses.length,
+//   //       notes: backup.notes.length,
+//   //       tasks: backup.tasks.length,
+//   //       links: backup.links.length,
+//   //       folders: totalFolders,
+//   //     });
+//   //     setSummaryModalVisible(true);
+//   //   } catch (error) {
+//   //     console.error('Export failed', error);
+//   //     notify('Export failed', 'Could not create the export file. Please try again.');
+//   //   } finally {
+//   //     setExporting(false);
+//   //   }
+//   // };
+
+
+//   // sss
+//   const handleExportJson = async () => {
+//     setExporting(true);
+
+//     try {
+//       const backup = await readBackupData();
+//       const file = createBackupFile(backup);
+
+//       await saveFile(
+//         EXPORT_FILE_NAME,
+//         JSON.stringify(file, null, 2),
+//         'application/json'
+//       );
+
+//       const totalFolders =
+//         backup.noteFolders.length +
+//         backup.taskFolders.length +
+//         backup.linkFolders.length;
+
+//       setExportStats({
+//         expenses: 0, // Not applicable
+//         notes: backup.notes.length,
+//         tasks: backup.tasks.length,
+//         links: backup.links.length,
+//         folders: totalFolders,
+//       });
+//       setSummaryModalVisible(true);
+//     } catch (error) {
+//       console.error('Export failed', error);
+//       notify('Export failed', 'Could not create the export file. Please try again.');
+//     } finally {
+//       setExporting(false);
+//     }
+//   };
+
+
+//   const handleUploadToCloud = async () => {
+//     setCloudActionLoading(true);
+//     try {
+//       const backup = await readBackupData();
+//       const stamp = new Date().toISOString().slice(0, 10);
+//       const fileName = `MoneyManager_Backup_${stamp}.json`;
+//       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+//       if (Platform.OS === 'web') {
+//         const blob = new Blob([content], { type: 'application/json' });
+//         const url = URL.createObjectURL(blob);
+//         const link = document.createElement('a');
+//         link.href = url;
+//         link.download = fileName;
+//         document.body.appendChild(link);
+//         link.click();
+//         document.body.removeChild(link);
+//         URL.revokeObjectURL(url);
+//         notify('Cloud Backup Saved', 'Your JSON backup file has been downloaded.');
+//       } else {
+//         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+//         if (!directory) throw new Error('No writable directory available.');
+//         const fileUri = `${directory}${fileName}`;
+//         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+//         if (await Sharing.isAvailableAsync()) {
+//           await Sharing.shareAsync(fileUri, {
+//             mimeType: 'application/json',
+//             dialogTitle: 'Upload Backup to Cloud / Files',
+//           });
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Cloud upload failed', error);
+//       notify('Error', 'Could not prepare backup for cloud upload.');
+//     } finally {
+//       setCloudActionLoading(false);
+//     }
+//   };
+
+//   const handleSendEmailBackup = async () => {
+//     setCloudActionLoading(true);
+//     try {
+//       const backup = await readBackupData();
+//       const stamp = new Date().toISOString().slice(0, 10);
+//       const fileName = `MoneyManager_Backup_${stamp}.json`;
+//       const content = JSON.stringify(createBackupFile(backup), null, 2);
+
+//       if (Platform.OS === 'web') {
+//         const blob = new Blob([content], { type: 'application/json' });
+//         const url = URL.createObjectURL(blob);
+//         const link = document.createElement('a');
+//         link.href = url;
+//         link.download = fileName;
+//         document.body.appendChild(link);
+//         link.click();
+//         document.body.removeChild(link);
+//         URL.revokeObjectURL(url);
+
+//         const subject = encodeURIComponent('Money Manager - JSON Backup');
+//         const body = encodeURIComponent('Please find your downloaded Money Manager JSON backup file attached.');
+//         window.location.href = `mailto:?subject=${subject}&body=${body}`;
+//         notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your email.');
+//       } else {
+//         const isAvailable = await MailComposer.isAvailableAsync();
+//         if (!isAvailable) {
+//           notify('Email Unavailable', 'This device is not configured to send emails.');
+//           return;
+//         }
+
+//         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+//         if (!directory) throw new Error('No writable directory available.');
+//         const fileUri = `${directory}${fileName}`;
+//         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
+
+//         await MailComposer.composeAsync({
+//           subject: 'Money Manager - Automated JSON Backup',
+//           body: 'Attached is your latest JSON backup file for Money Manager.',
+//           attachments: [fileUri],
+//         });
+//       }
+//     } catch (error) {
+//       console.error('Email backup failed', error);
+//       notify('Error', 'Could not open email composer.');
+//     } finally {
+//       setCloudActionLoading(false);
+//     }
+//   };
+
+//   const confirmImport = (data: ImportData): Promise<boolean> => {
+//     const writes: [string, string][] = [];
+
+//     if (data.expenses !== undefined) writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+//     if (data.monthlyBudget !== undefined) writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
+//     if (data.currency !== undefined) writes.push([STORAGE_KEYS.currency, data.currency]);
+//     if (data.profile !== undefined) writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
+//     if (data.firstUsed !== undefined) writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
+//     if (data.notes !== undefined) writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+//     if (data.tasks !== undefined) writes.push(['@tasks_app_data', JSON.stringify(data.tasks)]);
+//     if (data.links !== undefined) writes.push(['@links_app_data', JSON.stringify(data.links)]);
+//     if (data.noteFolders !== undefined) writes.push(['@notes_app_folders', JSON.stringify(data.noteFolders)]);
+//     if (data.taskFolders !== undefined) writes.push(['@tasks_app_folders', JSON.stringify(data.taskFolders)]);
+//     if (data.linkFolders !== undefined) writes.push(['@links_app_folders', JSON.stringify(data.linkFolders)]);
+
+//     const message = `This will replace your current stored data with the imported backup. This cannot be undone.`;
+
+//     return new Promise((resolve) => {
+//       if (Platform.OS === 'web') {
+//         resolve(window.confirm(`Import backup?\n\n${message}`));
+//         return;
+//       }
+
+//       Alert.alert('Import backup?', message, [
+//         { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+//         { text: 'Import', style: 'destructive', onPress: () => resolve(true) },
+//       ], {
+//         cancelable: true,
+//         onDismiss: () => resolve(false),
+//       });
+//     });
+//   };
+
+//   const handleImportData = async () => {
+//     setImporting(true);
+
+//     try {
+//       const result = await DocumentPicker.getDocumentAsync({
+//         type: ["application/json", "*/*"],
+//         copyToCacheDirectory: false,
+//       });
+
+//       if (result.canceled || !result.assets[0]) return;
+
+//       const fileAsset = result.assets[0];
+//       let fileUri = fileAsset.uri;
+
+//       if (Platform.OS === "android") {
+//         const fileName = fileAsset.name || `import_${Date.now()}.json`;
+//         const localDestination = `${FileSystem.documentDirectory}${fileName}`;
+
+//         const fileInfo = await FileSystem.getInfoAsync(localDestination);
+//         if (fileInfo.exists) {
+//           await FileSystem.deleteAsync(localDestination);
+//         }
+
+//         await FileSystem.copyAsync({
+//           from: fileUri,
+//           to: localDestination,
+//         });
+
+//         fileUri = localDestination;
+//       }
+
+//       const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+//         encoding: FileSystem.EncodingType.UTF8,
+//       });
+
+//       let parsedData: unknown;
+//       try {
+//         parsedData = JSON.parse(fileContent);
+//       } catch {
+//         throw new Error("The selected file is not valid JSON.");
+//       }
+
+//       const data = normalizeImport(parsedData);
+
+//       if (!(await confirmImport(data))) return;
+
+//       const writes: [string, string][] = [];
+
+//       if (data.expenses !== undefined) writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+//       if (data.monthlyBudget !== undefined) writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
+//       if (data.currency !== undefined) writes.push([STORAGE_KEYS.currency, data.currency]);
+//       if (data.profile !== undefined) writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
+//       if (data.firstUsed !== undefined) writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
+//       if (data.notes !== undefined) writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+//       if (data.tasks !== undefined) writes.push(['@tasks_app_data', JSON.stringify(data.tasks)]);
+//       if (data.links !== undefined) writes.push(['@links_app_data', JSON.stringify(data.links)]);
+//       if (data.noteFolders !== undefined) writes.push(['@notes_app_folders', JSON.stringify(data.noteFolders)]);
+//       if (data.taskFolders !== undefined) writes.push(['@tasks_app_folders', JSON.stringify(data.taskFolders)]);
+//       if (data.linkFolders !== undefined) writes.push(['@links_app_folders', JSON.stringify(data.linkFolders)]);
+
+//       if (writes.length === 0) {
+//         throw new Error("The backup does not contain anything to import.");
+//       }
+
+//       await AsyncStorage.multiSet(writes);
+
+//       notify(
+//         "Import complete",
+//         "Your backup was restored successfully."
+//       );
+//     } catch (error) {
+//       console.error("Import failed:", error);
+//       notify(
+//         "Import failed",
+//         error instanceof Error ? error.message : "Unable to read or parse the selected file."
+//       );
+//     } finally {
+//       setImporting(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <Head>
+//         <title>Settings | Money Manager</title>
+//       </Head>
+
+//       <ScrollView
+//         style={[styles.container, { paddingHorizontal: horizontalPadding }]}
+//         contentContainerStyle={styles.scrollContent}
+//         showsVerticalScrollIndicator={false}
+//       >
+//         <View style={styles.contentWrapper}>
+//           {/* Header */}
+//           <View style={styles.headerContainer}>
+//             <View style={{ flex: 1 }}>
+//               <Text style={styles.headerTitle}>Settings</Text>
+//               <Text style={styles.headerSubtitle}>
+//                 Manage your profile, JSON backups, and app data.
+//               </Text>
+//             </View>
+//           </View>
+
+//           {/* Profile / Username Section */}
+//           <View style={styles.sectionCard}>
+//             <View style={styles.sectionHeaderRow}>
+//               <Text style={styles.sectionTitle}>Profile Username</Text>
+//             </View>
+//             <Text style={styles.sectionDesc}>
+//               Set or update your display name used across your personal profile and notes.
+//             </Text>
+
+//             <View style={styles.usernameInputRow}>
+//               <TextInput
+//                 style={styles.inputTitle}
+//                 placeholder="Enter your username..."
+//                 placeholderTextColor={COLORS.textMuted}
+//                 value={usernameInput}
+//                 onChangeText={setUsernameInput}
+//               />
+//               <Pressable
+//                 style={[styles.saveUsernameButton, isSavingUsername && styles.buttonDisabled]}
+//                 onPress={handleSaveUsername}
+//                 disabled={isSavingUsername}
+//               >
+//                 {isSavingUsername ? (
+//                   <ActivityIndicator color={COLORS.accentText} size="small" />
+//                 ) : (
+//                   <Text style={styles.saveUsernameButtonText}>Save</Text>
+//                 )}
+//               </Pressable>
+//             </View>
+//           </View>
+
+//           {/* Backup & Restore Data Section */}
+//           <View style={styles.sectionCard}>
+//             <View style={styles.sectionHeaderRow}>
+//               <Text style={styles.sectionTitle}>Backup & Restore</Text>
+//             </View>
+//             <Text style={styles.sectionDesc}>
+//               Export a complete JSON backup containing all your expenses, notes, tasks, links, and custom folders.
+//             </Text>
+
+//             <Pressable
+//               onPress={() => router.push('/landing?scrollTo=import' as any)}
+//               style={styles.guideButton}
+//             >
+//               <Text style={styles.guideButtonText}>JSON Import Guide</Text>
+//             </Pressable>
+
+//             <View style={styles.actionButtonsRow}>
+//               <Pressable
+//                 style={[styles.exportButton, exporting && styles.buttonDisabled]}
+//                 onPress={handleExportJson}
+//                 disabled={exporting}
+//               >
+//                 {exporting ? (
+//                   <ActivityIndicator color={COLORS.accentText} size="small" />
+//                 ) : (
+//                   <Ionicons name="download-outline" size={18} color={COLORS.accentText} style={{ marginRight: 8 }} />
+//                 )}
+//                 <Text style={styles.exportButtonText}>
+//                   {exporting ? 'Exporting…' : 'Export JSON'}
+//                 </Text>
+//               </Pressable>
+
+//               <Pressable
+//                 style={[styles.importButton, importing && styles.buttonDisabled]}
+//                 onPress={handleImportData}
+//                 disabled={importing}
+//               >
+//                 {importing ? (
+//                   <ActivityIndicator color={COLORS.textPrimary} size="small" />
+//                 ) : (
+//                   <Ionicons
+//                     name="cloud-upload-outline"
+//                     size={18}
+//                     color={COLORS.textPrimary}
+//                     style={{ marginRight: 8 }}
+//                   />
+//                 )}
+//                 <Text style={styles.importButtonText}>
+//                   {importing ? 'Importing…' : 'Import JSON'}
+//                 </Text>
+//               </Pressable>
+//             </View>
+
+//             {/* Cloud & Email Backup Integrations */}
+//             <View style={styles.cloudBackupContainer}>
+//               <Text style={styles.cloudSubheading}>Cloud & Remote Backup</Text>
+//               <View style={styles.cloudButtonsRow}>
+//                 <Pressable
+//                   style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+//                   onPress={handleUploadToCloud}
+//                   disabled={cloudActionLoading}
+//                 >
+//                   <Ionicons name="globe" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+//                   <Text style={styles.cloudButtonText}>Save to Cloud</Text>
+//                 </Pressable>
+
+//                 <Pressable
+//                   style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+//                   onPress={handleSendEmailBackup}
+//                   disabled={cloudActionLoading}
+//                 >
+//                   <Ionicons name="mail-outline" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+//                   <Text style={styles.cloudButtonText}>Email Backup</Text>
+//                 </Pressable>
+//               </View>
+//             </View>
+//           </View>
+
+//           {/* Export Success Summary Modal */}
+//           <Modal
+//             animationType="fade"
+//             transparent={true}
+//             visible={summaryModalVisible}
+//             onRequestClose={() => setSummaryModalVisible(false)}
+//           >
+//             <View style={styles.modalOverlay}>
+//               <Pressable style={styles.modalBackdrop} onPress={() => setSummaryModalVisible(false)} />
+
+//               <View style={styles.modalContent}>
+//                 <View style={styles.modalHeader}>
+//                   <Text style={styles.modalHeaderTitle}>Export Successful</Text>
+//                   <Pressable onPress={() => setSummaryModalVisible(false)}>
+//                     <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+//                   </Pressable>
+//                 </View>
+
+//                 <Text style={styles.exportModalSubtitle}>
+//                   Your complete JSON backup has been successfully generated and downloaded with the following contents:
+//                 </Text>
+
+//                 <View style={styles.summaryList}>
+//                   <View style={styles.summaryRow}>
+//                     <Text style={styles.summaryLabel}>Expenses:</Text>
+//                     <Text style={styles.summaryValue}>{exportStats.expenses}</Text>
+//                   </View>
+//                   <View style={styles.summaryRow}>
+//                     <Text style={styles.summaryLabel}>Notes:</Text>
+//                     <Text style={styles.summaryValue}>{exportStats.notes}</Text>
+//                   </View>
+//                   <View style={styles.summaryRow}>
+//                     <Text style={styles.summaryLabel}>Tasks:</Text>
+//                     <Text style={styles.summaryValue}>{exportStats.tasks}</Text>
+//                   </View>
+//                   <View style={styles.summaryRow}>
+//                     <Text style={styles.summaryLabel}>Links:</Text>
+//                     <Text style={styles.summaryValue}>{exportStats.links}</Text>
+//                   </View>
+//                   <View style={styles.summaryRow}>
+//                     <Text style={styles.summaryLabel}>Custom Folders:</Text>
+//                     <Text style={styles.summaryValue}>{exportStats.folders}</Text>
+//                   </View>
+//                 </View>
+
+//                 <Pressable
+//                   style={styles.summaryCloseButton}
+//                   onPress={() => setSummaryModalVisible(false)}
+//                 >
+//                   <Text style={styles.summaryCloseButtonText}>Done</Text>
+//                 </Pressable>
+//               </View>
+//             </View>
+//           </Modal>
+//         </View>
+//       </ScrollView>
+//     </>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: COLORS.bg,
+//   },
+//   scrollContent: {
+//     paddingTop: 24,
+//     paddingBottom: 110,
+//   },
+//   contentWrapper: {
+//     width: '100%',
+//     maxWidth: 800,
+//     alignSelf: 'center',
+//   },
+//   headerContainer: {
+//     marginBottom: 20,
+//   },
+//   headerTitle: {
+//     fontSize: 28,
+//     fontWeight: '800',
+//     color: COLORS.textPrimary,
+//   },
+//   headerSubtitle: {
+//     fontSize: 14,
+//     color: COLORS.textSecondary,
+//     marginTop: 4,
+//   },
+//   sectionCard: {
+//     backgroundColor: COLORS.surface,
+//     borderRadius: 16,
+//     padding: 20,
+//     marginBottom: 20,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//   },
+//   sectionHeaderRow: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 6,
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: '700',
+//     color: COLORS.textPrimary,
+//   },
+//   sectionDesc: {
+//     fontSize: 14,
+//     color: COLORS.textSecondary,
+//     marginBottom: 16,
+//     lineHeight: 20,
+//   },
+//   usernameInputRow: {
+//     flexDirection: 'row',
+//     gap: 10,
+//     alignItems: 'center',
+//   },
+//   inputTitle: {
+//     flex: 1,
+//     backgroundColor: COLORS.surfaceElevated,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//     borderRadius: 10,
+//     paddingHorizontal: 14,
+//     paddingVertical: 12,
+//     fontSize: 15,
+//     fontWeight: '600',
+//     color: COLORS.textPrimary,
+//     ...Platform.select({
+//       web: {
+//         outlineStyle: 'none',
+//       } as any,
+//     }),
+//   },
+//   saveUsernameButton: {
+//     backgroundColor: COLORS.accent,
+//     paddingHorizontal: 20,
+//     paddingVertical: 12,
+//     borderRadius: 10,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   saveUsernameButtonText: {
+//     color: COLORS.accentText,
+//     fontWeight: '800',
+//     fontSize: 15,
+//   },
+//   guideButton: {
+//     backgroundColor: COLORS.surfaceElevated,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//     paddingHorizontal: 20,
+//     paddingVertical: 12,
+//     marginBottom: 16,
+//     borderRadius: 10,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     alignSelf: 'flex-start',
+//   },
+//   guideButtonText: {
+//     color: COLORS.textPrimary,
+//     fontWeight: '700',
+//     fontSize: 14,
+//   },
+//   actionButtonsRow: {
+//     flexDirection: 'row',
+//     gap: 12,
+//   },
+//   exportButton: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: COLORS.accent,
+//     paddingVertical: 14,
+//     borderRadius: 12,
+//   },
+//   exportButtonText: {
+//     color: COLORS.accentText,
+//     fontWeight: '800',
+//     fontSize: 15,
+//   },
+//   importButton: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: COLORS.surfaceElevated,
+//     paddingVertical: 14,
+//     borderRadius: 12,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//   },
+//   importButtonText: {
+//     color: COLORS.textPrimary,
+//     fontWeight: '700',
+//     fontSize: 15,
+//   },
+//   buttonDisabled: {
+//     opacity: 0.6,
+//   },
+//   cloudBackupContainer: {
+//     marginTop: 16,
+//     paddingTop: 16,
+//     borderTopWidth: 1,
+//     borderTopColor: COLORS.border,
+//   },
+//   cloudSubheading: {
+//     fontSize: 13,
+//     fontWeight: '600',
+//     color: COLORS.textSecondary,
+//     marginBottom: 10,
+//   },
+//   cloudButtonsRow: {
+//     flexDirection: 'row',
+//     gap: 10,
+//   },
+//   cloudOptionButton: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     backgroundColor: COLORS.surfaceElevated,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//     paddingVertical: 12,
+//     borderRadius: 10,
+//   },
+//   cloudButtonText: {
+//     fontSize: 13,
+//     fontWeight: '700',
+//     color: COLORS.textPrimary,
+//   },
+//   modalOverlay: {
+//     flex: 1,
+//     backgroundColor: 'rgba(0, 0, 0, 0.75)',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     padding: 20,
+//   },
+//   modalBackdrop: {
+//     ...StyleSheet.absoluteFill,
+//   },
+//   modalContent: {
+//     backgroundColor: COLORS.surface,
+//     borderRadius: 20,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//     padding: 22,
+//     width: '100%',
+//     maxWidth: 480,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 10 },
+//     shadowOpacity: 0.4,
+//     shadowRadius: 20,
+//     elevation: 10,
+//   },
+//   modalHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//   },
+//   modalHeaderTitle: {
+//     fontSize: 20,
+//     fontWeight: '800',
+//     color: COLORS.textPrimary,
+//   },
+//   exportModalSubtitle: {
+//     fontSize: 14,
+//     color: COLORS.textSecondary,
+//     marginBottom: 16,
+//     lineHeight: 20,
+//   },
+//   summaryList: {
+//     backgroundColor: COLORS.surfaceElevated,
+//     borderRadius: 12,
+//     borderWidth: 1,
+//     borderColor: COLORS.border,
+//     padding: 14,
+//     marginBottom: 20,
+//     gap: 10,
+//   },
+//   summaryRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   summaryLabel: {
+//     fontSize: 14,
+//     color: COLORS.textSecondary,
+//     fontWeight: '600',
+//   },
+//   summaryValue: {
+//     fontSize: 15,
+//     color: COLORS.textPrimary,
+//     fontWeight: '800',
+//   },
+//   summaryCloseButton: {
+//     backgroundColor: COLORS.accent,
+//     paddingVertical: 14,
+//     borderRadius: 12,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   summaryCloseButtonText: {
+//     color: COLORS.accentText,
+//     fontWeight: '800',
+//     fontSize: 15,
+//   },
+// });
+
+
+
+// newer3
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Modal,
   Platform,
   Pressable,
@@ -19,45 +3147,36 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import * as MailComposer from 'expo-mail-composer';
+import Head from 'expo-router/head';
 
 import { STORAGE_KEYS } from '@/constants/storage';
 import {
-  buildCsv,
-  buildXls,
+  EXPORT_FILE_NAME,
   createBackupFile,
-  isExpense,
   isRecord,
   normalizeImport,
   type BackupData,
-  type ExportFormat,
   type ImportData,
 } from '@/utils/dataExport';
-import { GlobalStyles } from '@/global.styles';
 import { router } from 'expo-router';
-// import { checkAndPromptWeeklyBackup } from '@/utils/dataBackup';
 
-
-// Expanded list of global currencies
-const ALL_CURRENCIES = [
-  { label: 'South African Rand (R)', symbol: 'R', code: 'ZAR' },
-  { label: 'US Dollar ($)', symbol: '$', code: 'USD' },
-  { label: 'Euro (€)', symbol: '€', code: 'EUR' },
-  { label: 'British Pound (£)', symbol: '£', code: 'GBP' },
-  { label: 'Australian Dollar (A$)', symbol: 'A$', code: 'AUD' },
-  { label: 'Canadian Dollar (C$)', symbol: 'C$', code: 'CAD' },
-  { label: 'Indian Rupee (₹)', symbol: '₹', code: 'INR' },
-  { label: 'Japanese Yen (¥)', symbol: '¥', code: 'JPY' },
-  { label: 'Chinese Yuan (¥)', symbol: '¥', code: 'CNY' },
-  { label: 'Brazilian Real (R$)', symbol: 'R$', code: 'BRL' },
-  { label: 'Mexican Peso ($)', symbol: '$', code: 'MXN' },
-  { label: 'New Zealand Dollar (NZ$)', symbol: 'NZ$', code: 'NZD' },
-  { label: 'Swiss Franc (CHF)', symbol: 'CHF', code: 'CHF' },
-  { label: 'Singapore Dollar (S$)', symbol: 'S$', code: 'SGD' },
-];
+// Theme Palette (Matches Notes, Tasks, and Links)
+const COLORS = {
+  bg: '#0F1115',
+  surface: '#1A1D24',
+  surfaceElevated: '#242832',
+  border: '#2E3340',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#9CA3AF',
+  textMuted: '#6B7280',
+  accent: '#F59E0B',
+  accentText: '#111827',
+  success: '#10B981',
+  danger: '#EF4444',
+};
 
 const parseStoredJson = (raw: string | null): unknown => {
   if (!raw) return null;
-
   try {
     return JSON.parse(raw);
   } catch {
@@ -73,121 +3192,115 @@ const notify = (title: string, message: string) => {
   }
 };
 
-
+interface ExportSummaryStats {
+  notes: number;
+  tasks: number;
+  links: number;
+  folders: number;
+}
 
 export default function SettingsScreen() {
   const { width } = useWindowDimensions();
   const horizontalPadding = width >= 768 ? 40 : 20;
 
-  const [currentCurrency, setCurrentCurrency] = useState<string>('ZAR');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [usernameInput, setUsernameInput] = useState<string>('');
+  const [isSavingUsername, setIsSavingUsername] = useState<boolean>(false);
 
-  const [exportModalVisible, setExportModalVisible] = useState<boolean>(false);
   const [exporting, setExporting] = useState<boolean>(false);
   const [importing, setImporting] = useState<boolean>(false);
   const [cloudActionLoading, setCloudActionLoading] = useState<boolean>(false);
 
+  // Success Summary Modal State
+  const [summaryModalVisible, setSummaryModalVisible] = useState<boolean>(false);
+  const [exportStats, setExportStats] = useState<ExportSummaryStats>({
+    notes: 0,
+    tasks: 0,
+    links: 0,
+    folders: 0,
+  });
+
   useEffect(() => {
     loadSettings();
-      
-    // checkAndPromptWeeklyBackup(handleSendEmailBackup);
-    // checkAndPromptWeeklyBackup(handleUploadToCloud);
-
   }, []);
-
-
-  
-    // --- Backup reminders 
-  // useEffect(() => {
-  //     // Pass your email backup handler function here
-  //     checkAndPromptWeeklyBackup(handleSendEmailBackup);
-  //   }, []);
-  // }
 
   const loadSettings = async () => {
     try {
-      const savedCurrency = await AsyncStorage.getItem(STORAGE_KEYS.currency);
-      if (savedCurrency) {
-        setCurrentCurrency(savedCurrency);
+      const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+      const parsedProfile = parseStoredJson(savedProfileRaw);
+      if (isRecord(parsedProfile) && typeof parsedProfile.name === 'string') {
+        setUsernameInput(parsedProfile.name);
       }
     } catch (error) {
       console.error('Failed to load settings', error);
     }
   };
 
-  const handleCurrencyChange = async (code: string, symbol: string) => {
-    try {
-      setCurrentCurrency(code);
-      await AsyncStorage.setItem(STORAGE_KEYS.currency, code);
-      setModalVisible(false);
-      setSearchQuery('');
+  const handleSaveUsername = async () => {
+    const trimmedName = usernameInput.trim();
+    if (!trimmedName) {
+      notify('Validation', 'Username cannot be empty.');
+      return;
+    }
 
-      if (Platform.OS === 'web') {
-        window.alert(`Currency changed to ${symbol}`);
-      } else {
-        Alert.alert('Success', `Currency updated to ${symbol}`);
-      }
+    setIsSavingUsername(true);
+    try {
+      const savedProfileRaw = await AsyncStorage.getItem(STORAGE_KEYS.profile);
+      const parsedProfile = isRecord(parseStoredJson(savedProfileRaw))
+        ? (parseStoredJson(savedProfileRaw) as Record<string, unknown>)
+        : {};
+
+      const updatedProfile = { ...parsedProfile, name: trimmedName };
+      await AsyncStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(updatedProfile));
+
+      notify('Success', 'Username updated successfully.');
     } catch (error) {
-      console.error('Failed to save currency', error);
+      console.error('Failed to save username', error);
+      notify('Error', 'Could not save username.');
+    } finally {
+      setIsSavingUsername(false);
     }
   };
 
-  const selectedCurrencyObj = ALL_CURRENCIES.find((c) => c.code === currentCurrency) || {
-    label: `South African Rand (${currentCurrency})`,
-    symbol: currentCurrency,
-  };
-
-  const filteredCurrencies = ALL_CURRENCIES.filter(
-    (item) =>
-      item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.symbol.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // ----------------------------------
-  // Export helpers
-  // ----------------------------------
   const readBackupData = async (): Promise<BackupData> => {
     const [
-      expensesRaw,
-      budgetRaw,
-      currencyRaw,
       profileRaw,
-      firstUsedRaw,
-      seededRaw,
-      shoppingRaw,
       notesRaw,
+      tasksRaw,
+      linksRaw,
+      noteFoldersRaw,
+      taskFoldersRaw,
+      linkFoldersRaw,
     ] = await Promise.all([
-      AsyncStorage.getItem(STORAGE_KEYS.expenses),
-      AsyncStorage.getItem(STORAGE_KEYS.monthlyBudget),
-      AsyncStorage.getItem(STORAGE_KEYS.currency),
       AsyncStorage.getItem(STORAGE_KEYS.profile),
-      AsyncStorage.getItem(STORAGE_KEYS.firstUsed),
-      AsyncStorage.getItem(STORAGE_KEYS.monthlyDummySeeded),
-      AsyncStorage.getItem(STORAGE_KEYS.shoppingLists),
       AsyncStorage.getItem(STORAGE_KEYS.notes),
+      AsyncStorage.getItem('@tasks_app_data'),
+      AsyncStorage.getItem('@links_app_data'),
+      AsyncStorage.getItem('@notes_app_folders'),
+      AsyncStorage.getItem('@tasks_app_folders'),
+      AsyncStorage.getItem('@links_app_folders'),
     ]);
 
-    const parsedExpenses = parseStoredJson(expensesRaw);
-    const parsedBudget = Number(budgetRaw);
     const parsedProfile = parseStoredJson(profileRaw);
-    const parsedShopping = parseStoredJson(shoppingRaw);
+    const username =
+      isRecord(parsedProfile) && typeof parsedProfile.name === 'string'
+        ? parsedProfile.name
+        : null;
+
     const parsedNotes = parseStoredJson(notesRaw);
+    const parsedTasks = parseStoredJson(tasksRaw);
+    const parsedLinks = parseStoredJson(linksRaw);
+    const parsedNoteFolders = parseStoredJson(noteFoldersRaw);
+    const parsedTaskFolders = parseStoredJson(taskFoldersRaw);
+    const parsedLinkFolders = parseStoredJson(linkFoldersRaw);
 
     return {
-      expenses: Array.isArray(parsedExpenses)
-        ? parsedExpenses.filter(isExpense)
-        : [],
-      monthlyBudget:
-        budgetRaw && Number.isFinite(parsedBudget) && parsedBudget > 0
-          ? parsedBudget
-          : null,
-      currency: currencyRaw || null,
-      profile: isRecord(parsedProfile) ? parsedProfile : null,
-      firstUsed: firstUsedRaw || null,
-      monthlyDummySeeded: seededRaw === 'true',
+      username,
       notes: Array.isArray(parsedNotes) ? parsedNotes : [],
+      tasks: Array.isArray(parsedTasks) ? parsedTasks : [],
+      links: Array.isArray(parsedLinks) ? parsedLinks : [],
+      noteFolders: Array.isArray(parsedNoteFolders) ? parsedNoteFolders : [],
+      taskFolders: Array.isArray(parsedTaskFolders) ? parsedTaskFolders : [],
+      linkFolders: Array.isArray(parsedLinkFolders) ? parsedLinkFolders : [],
     };
   };
 
@@ -222,49 +3335,38 @@ export default function SettingsScreen() {
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(fileUri, {
         mimeType,
-        dialogTitle: 'Export Money Manager data',
+        dialogTitle: 'Export Productivity Backup',
       });
     } else {
       notify('Export saved', `The file was saved to ${fileUri}`);
     }
   };
 
-  const handleExportData = async (format: ExportFormat) => {
+  const handleExportJson = async () => {
     setExporting(true);
 
     try {
       const backup = await readBackupData();
-      const stamp = new Date().toISOString().slice(0, 10);
+      const file = createBackupFile(backup);
 
-      if (format === 'json') {
-        const file = createBackupFile(backup);
-
-        await saveFile(
-          `MoneyManager_Backup_${stamp}.json`,
-          JSON.stringify(file, null, 2),
-          'application/json'
-        );
-      } else if (format === 'csv') {
-        await saveFile(
-          `MoneyManager_Expenses_${stamp}.csv`,
-          buildCsv(backup.expenses, backup.currency),
-          'text/csv;charset=utf-8'
-        );
-      } else {
-        await saveFile(
-          `MoneyManager_Expenses_${stamp}.xls`,
-          buildXls(backup),
-          'application/vnd.ms-excel'
-        );
-      }
-
-      setExportModalVisible(false);
-      notify(
-        'Export complete',
-        format === 'json'
-          ? 'A complete JSON backup was created. Keep it safe — it can be imported later.'
-          : 'Your expense data was exported as a spreadsheet.'
+      await saveFile(
+        EXPORT_FILE_NAME,
+        JSON.stringify(file, null, 2),
+        'application/json'
       );
+
+      const totalFolders =
+        backup.noteFolders.length +
+        backup.taskFolders.length +
+        backup.linkFolders.length;
+
+      setExportStats({
+        notes: backup.notes.length,
+        tasks: backup.tasks.length,
+        links: backup.links.length,
+        folders: totalFolders,
+      });
+      setSummaryModalVisible(true);
     } catch (error) {
       console.error('Export failed', error);
       notify('Export failed', 'Could not create the export file. Please try again.');
@@ -273,33 +3375,27 @@ export default function SettingsScreen() {
     }
   };
 
-  // ----------------------------------
-  // Cloud & Email Backup Integrations (Cross-Platform)
-  // ----------------------------------
   const handleUploadToCloud = async () => {
     setCloudActionLoading(true);
     try {
       const backup = await readBackupData();
-      const stamp = new Date().toISOString().slice(0, 10);
-      const fileName = `MoneyManager_Backup_${stamp}.json`;
       const content = JSON.stringify(createBackupFile(backup), null, 2);
 
       if (Platform.OS === 'web') {
-        // On web, trigger download which saves to local/cloud-synced folders (Google Drive / OneDrive desktop apps)
         const blob = new Blob([content], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = fileName;
+        link.download = EXPORT_FILE_NAME;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        notify('Cloud / Local Backup Saved', 'Your JSON backup file has been downloaded. Save it to your cloud-synced folder (Google Drive, OneDrive, etc.).');
+        notify('Cloud Backup Saved', 'Your notes JSON backup file has been downloaded.');
       } else {
         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
         if (!directory) throw new Error('No writable directory available.');
-        const fileUri = `${directory}${fileName}`;
+        const fileUri = `${directory}${EXPORT_FILE_NAME}`;
         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
 
         if (await Sharing.isAvailableAsync()) {
@@ -307,8 +3403,6 @@ export default function SettingsScreen() {
             mimeType: 'application/json',
             dialogTitle: 'Upload Backup to Cloud / Files',
           });
-        } else {
-          notify('Unavailable', 'Sharing is not available on this device.');
         }
       }
     } catch (error) {
@@ -323,26 +3417,23 @@ export default function SettingsScreen() {
     setCloudActionLoading(true);
     try {
       const backup = await readBackupData();
-      const stamp = new Date().toISOString().slice(0, 10);
-      const fileName = `MoneyManager_Backup_${stamp}.json`;
       const content = JSON.stringify(createBackupFile(backup), null, 2);
 
       if (Platform.OS === 'web') {
-        // On web, also download file so user can attach it, and open mailto link
         const blob = new Blob([content], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = fileName;
+        link.download = EXPORT_FILE_NAME;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        const subject = encodeURIComponent('Money Manager - JSON Backup');
-        const body = encodeURIComponent('Please find your downloaded Money Manager JSON backup file attached to this email.');
+        const subject = encodeURIComponent('Money Manager - Productivity Backup');
+        const body = encodeURIComponent('Please find your downloaded notes and productivity JSON backup file attached.');
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
-        notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your newly opened email window.');
+        notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your email.');
       } else {
         const isAvailable = await MailComposer.isAvailableAsync();
         if (!isAvailable) {
@@ -352,12 +3443,12 @@ export default function SettingsScreen() {
 
         const directory = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
         if (!directory) throw new Error('No writable directory available.');
-        const fileUri = `${directory}${fileName}`;
+        const fileUri = `${directory}${EXPORT_FILE_NAME}`;
         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
 
         await MailComposer.composeAsync({
-          subject: 'Money Manager - Automated JSON Backup',
-          body: 'Attached is your latest JSON backup file for Money Manager. Save this file securely to restore your expenses if needed.',
+          subject: 'Money Manager - Automated Productivity Backup',
+          body: 'Attached is your latest notes and productivity JSON backup file.',
           attachments: [fileUri],
         });
       }
@@ -369,21 +3460,8 @@ export default function SettingsScreen() {
     }
   };
 
-  // ----------------------------------
-  // Import helpers
-  // ----------------------------------
   const confirmImport = (data: ImportData): Promise<boolean> => {
-    const parts: string[] = [];
-
-    if (data.expenses) parts.push(`${data.expenses.length} expenses`);
-    if (data.monthlyBudget !== undefined) parts.push('the monthly budget');
-    if (data.currency !== undefined) parts.push('the currency');
-    if (data.profile !== undefined) parts.push('your profile');
-    if (data.notes) parts.push(`${data.notes.length} notes`);
-
-    const message = `This will replace your current ${
-      parts.length > 0 ? parts.join(', ') : 'stored data'
-    }. This cannot be undone.`;
+    const message = `This will replace your current notes, tasks, links, and folders with the imported backup. This cannot be undone.`;
 
     return new Promise((resolve) => {
       if (Platform.OS === 'web') {
@@ -401,8 +3479,7 @@ export default function SettingsScreen() {
     });
   };
 
-
-const handleImportData = async () => {
+  const handleImportData = async () => {
     setImporting(true);
 
     try {
@@ -416,9 +3493,8 @@ const handleImportData = async () => {
       const fileAsset = result.assets[0];
       let fileUri = fileAsset.uri;
 
-      // On Android, content:// URIs must be copied to documentDirectory to be readable
       if (Platform.OS === "android") {
-        const fileName = fileAsset.name || `import_${Date.now()}.json`;
+        const fileName = fileAsset.name || EXPORT_FILE_NAME;
         const localDestination = `${FileSystem.documentDirectory}${fileName}`;
 
         const fileInfo = await FileSystem.getInfoAsync(localDestination);
@@ -445,51 +3521,40 @@ const handleImportData = async () => {
         throw new Error("The selected file is not valid JSON.");
       }
 
-      // 1. Validate and normalize the imported data (schema checks & sequential IDs)
       const data = normalizeImport(parsedData);
 
       if (!(await confirmImport(data))) return;
 
       const writes: [string, string][] = [];
 
-      if (data.expenses !== undefined) {
-        writes.push([STORAGE_KEYS.expenses, JSON.stringify(data.expenses)]);
+      if (data.username !== undefined) {
+        const existingProfile = parseStoredJson(await AsyncStorage.getItem(STORAGE_KEYS.profile));
+        const updatedProfile = isRecord(existingProfile)
+          ? { ...existingProfile, name: data.username }
+          : { name: data.username };
+        writes.push([STORAGE_KEYS.profile, JSON.stringify(updatedProfile)]);
       }
-
-      if (data.monthlyBudget !== undefined) {
-        writes.push([STORAGE_KEYS.monthlyBudget, String(data.monthlyBudget)]);
-      }
-
-      if (data.currency !== undefined) {
-        writes.push([STORAGE_KEYS.currency, data.currency]);
-      }
-
-      if (data.profile !== undefined) {
-        writes.push([STORAGE_KEYS.profile, JSON.stringify(data.profile)]);
-      }
-
-      if (data.firstUsed !== undefined) {
-        writes.push([STORAGE_KEYS.firstUsed, data.firstUsed]);
-      }
-
-      if (data.notes !== undefined) {
-        writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
-      }
+      if (data.notes !== undefined) writes.push([STORAGE_KEYS.notes, JSON.stringify(data.notes)]);
+      if (data.tasks !== undefined) writes.push(['@tasks_app_data', JSON.stringify(data.tasks)]);
+      if (data.links !== undefined) writes.push(['@links_app_data', JSON.stringify(data.links)]);
+      if (data.noteFolders !== undefined) writes.push(['@notes_app_folders', JSON.stringify(data.noteFolders)]);
+      if (data.taskFolders !== undefined) writes.push(['@tasks_app_folders', JSON.stringify(data.taskFolders)]);
+      if (data.linkFolders !== undefined) writes.push(['@links_app_folders', JSON.stringify(data.linkFolders)]);
 
       if (writes.length === 0) {
         throw new Error("The backup does not contain anything to import.");
       }
 
-      // 2. Save directly to AsyncStorage so all views load the restored data on focus/reload
       await AsyncStorage.multiSet(writes);
 
-      if (data.currency !== undefined) {
-        setCurrentCurrency(data.currency);
+      // Update local state if username was imported
+      if (data.username) {
+        setUsernameInput(data.username);
       }
 
       notify(
         "Import complete",
-        "Your backup was restored successfully. Reopen your expense pages to see the updated data."
+        "Your productivity backup was restored successfully."
       );
     } catch (error) {
       console.error("Import failed:", error);
@@ -502,351 +3567,227 @@ const handleImportData = async () => {
     }
   };
 
-  
-
   return (
-    <ScrollView
-      style={[styles.container, { paddingHorizontal: horizontalPadding }]}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.contentWrapper}>
-        {/* Header */}
-        <View style={styles.headerContainer}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>Settings</Text>
-            <Text style={styles.headerSubtitle}>
-              Manage your currency, backups, and app data.
-            </Text>
-          </View>
-        </View>
+    <>
+      <Head>
+        <title>Settings | Money Manager</title>
+      </Head>
 
-        {/* Currency Section */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Default Currency</Text>
-          </View>
-          <Text style={styles.sectionDesc}>
-            Select the currency symbol used across your expenses, budgets, and exports.
-          </Text>
-
-          <Pressable style={styles.comboboxTrigger} onPress={() => setModalVisible(true)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.comboboxTriggerText}>{selectedCurrencyObj.label}</Text>
-            </View>
-            <Ionicons name="chevron-down" size={18} color="#6B7280" />
-          </Pressable>
-        </View>
-
-        {/* Backup & Restore Data Section */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Backup & Restore</Text>
-          </View>
-          <Text style={styles.sectionDesc}>
-            Export a complete JSON backup you can import later, or download your expenses as a
-            CSV or Excel spreadsheet. Only JSON backups can be imported.
-          </Text>
-
-          <Pressable 
-            onPress={() => router.push('/landing?scrollTo=import')}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>JSON Import Guide</Text>
-          </Pressable>
-
-          <View style={styles.actionButtonsRow}>
-            <Pressable
-              style={[styles.exportButton, exporting && styles.buttonDisabled]}
-              onPress={() => setExportModalVisible(true)}
-              disabled={exporting}
-            >
-              {exporting ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Ionicons name="download-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
-              )}
-              <Text style={styles.exportButtonText}>
-                {exporting ? 'Exporting…' : 'Export Data'}
+      <ScrollView
+        style={[styles.container, { paddingHorizontal: horizontalPadding }]}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.contentWrapper}>
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle}>Settings</Text>
+              <Text style={styles.headerSubtitle}>
+                Manage your username, JSON backups, and productivity data.
               </Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.importButton, importing && styles.buttonDisabled]}
-              onPress={handleImportData}
-              disabled={importing}
-            >
-              {importing ? (
-                <ActivityIndicator color="#1F2937" size="small" />
-              ) : (
-                <Ionicons
-                  name="cloud-upload-outline"
-                  size={18}
-                  color="#1F2937"
-                  style={{ marginRight: 8 }}
-                />
-              )}
-              <Text style={styles.importButtonText}>
-                {importing ? 'Importing…' : 'Import JSON'}
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* Cloud & Email Backup Integrations (Cross-Platform) */}
-          <View style={styles.cloudBackupContainer}>
-            <Text style={styles.cloudSubheading}>Cloud & Remote Backup</Text>
-            <View style={styles.cloudButtonsRow}>
-              <Pressable
-                style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
-                onPress={handleUploadToCloud}
-                disabled={cloudActionLoading}
-              >
-                <Ionicons name="globe" size={18} color="#15803D" style={{ marginRight: 6 }} />
-                <Text style={styles.cloudButtonText}>Save to Cloud</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
-                onPress={handleSendEmailBackup}
-                disabled={cloudActionLoading}
-              >
-                <Ionicons name="mail-outline" size={18} color="#1D4ED8" style={{ marginRight: 6 }} />
-                <Text style={styles.cloudButtonText}>Email Backup</Text>
-              </Pressable>
             </View>
           </View>
 
-          <View style={styles.formatNote}>
-            <Ionicons name="information-circle-outline" size={16} color="#6B7280" />
-            <Text style={styles.formatNoteText}>
-              JSON restores everything. CSV and XLS are spreadsheet exports for viewing and
-              reporting.
+          {/* Profile / Username Section */}
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Profile Username</Text>
+            </View>
+            <Text style={styles.sectionDesc}>
+              Set or update your display name used across your personal profile and notes.
             </Text>
-          </View>
-        </View>
 
-        {/* Currency Selection Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalHeaderTitle}>Select Currency</Text>
-                <Pressable
-                  onPress={() => {
-                    setModalVisible(false);
-                    setSearchQuery('');
-                  }}
-                >
-                  <Ionicons name="close" size={24} color="#111827" />
-                </Pressable>
-              </View>
-
-              <View style={styles.modalSearchContainer}>
-                <Ionicons name="search" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-                <TextInput
-                  style={styles.modalSearchInput}
-                  placeholder="Search currency name or symbol..."
-                  placeholderTextColor="#9CA3AF"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoFocus
-                />
-                {searchQuery.length > 0 && (
-                  <Pressable onPress={() => setSearchQuery('')}>
-                    <Ionicons name="close-circle" size={16} color="#9CA3AF" />
-                  </Pressable>
-                )}
-              </View>
-
-              <FlatList
-                data={filteredCurrencies}
-                keyExtractor={(item) => item.code}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                renderItem={({ item }) => {
-                  const isSelected = currentCurrency === item.code;
-
-                  return (
-                    <Pressable
-                      style={[
-                        styles.currencyOptionItem,
-                        isSelected && styles.currencyOptionItemActive,
-                      ]}
-                      onPress={() => handleCurrencyChange(item.code, item.label)}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View
-                          style={[
-                            styles.currencySymbolBadge,
-                            isSelected && { backgroundColor: '#E59400' },
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.currencySymbolText,
-                              isSelected && { color: '#FFFFFF' },
-                            ]}
-                          >
-                            {item.symbol}
-                          </Text>
-                        </View>
-                        <Text
-                          style={[
-                            styles.currencyOptionText,
-                            isSelected && { fontWeight: '700', color: '#E59400' },
-                          ]}
-                        >
-                          {item.label}
-                        </Text>
-                      </View>
-                      {isSelected && (
-                        <Ionicons name="checkmark-circle" size={20} color="#E59400" />
-                      )}
-                    </Pressable>
-                  );
-                }}
+            <View style={styles.usernameInputRow}>
+              <TextInput
+                style={styles.inputTitle}
+                placeholder="Enter your username..."
+                placeholderTextColor={COLORS.textMuted}
+                value={usernameInput}
+                onChangeText={setUsernameInput}
               />
+              <Pressable
+                style={[styles.saveUsernameButton, isSavingUsername && styles.buttonDisabled]}
+                onPress={handleSaveUsername}
+                disabled={isSavingUsername}
+              >
+                {isSavingUsername ? (
+                  <ActivityIndicator color={COLORS.accentText} size="small" />
+                ) : (
+                  <Text style={styles.saveUsernameButtonText}>Save</Text>
+                )}
+              </Pressable>
             </View>
           </View>
-        </Modal>
 
-        {/* Export Format Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={exportModalVisible}
-          onRequestClose={() => !exporting && setExportModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.exportModalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalHeaderTitle}>Export Data</Text>
+          {/* Backup & Restore Data Section */}
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Backup & Restore</Text>
+            </View>
+            <Text style={styles.sectionDesc}>
+              Export a complete JSON backup containing all your notes, tasks, links, and custom folders.
+            </Text>
+
+            <Pressable
+              onPress={() => router.push('/landing?scrollTo=import' as any)}
+              style={styles.guideButton}
+            >
+              <Text style={styles.guideButtonText}>JSON Import Guide</Text>
+            </Pressable>
+
+            <View style={styles.actionButtonsRow}>
+              <Pressable
+                style={[styles.exportButton, exporting && styles.buttonDisabled]}
+                onPress={handleExportJson}
+                disabled={exporting}
+              >
+                {exporting ? (
+                  <ActivityIndicator color={COLORS.accentText} size="small" />
+                ) : (
+                  <Ionicons name="download-outline" size={18} color={COLORS.accentText} style={{ marginRight: 8 }} />
+                )}
+                <Text style={styles.exportButtonText}>
+                  {exporting ? 'Exporting…' : 'Export JSON'}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.importButton, importing && styles.buttonDisabled]}
+                onPress={handleImportData}
+                disabled={importing}
+              >
+                {importing ? (
+                  <ActivityIndicator color={COLORS.textPrimary} size="small" />
+                ) : (
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={18}
+                    color={COLORS.textPrimary}
+                    style={{ marginRight: 8 }}
+                  />
+                )}
+                <Text style={styles.importButtonText}>
+                  {importing ? 'Importing…' : 'Import JSON'}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Cloud & Email Backup Integrations */}
+            <View style={styles.cloudBackupContainer}>
+              <Text style={styles.cloudSubheading}>Cloud & Remote Backup</Text>
+              <View style={styles.cloudButtonsRow}>
                 <Pressable
-                  onPress={() => setExportModalVisible(false)}
-                  disabled={exporting}
+                  style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+                  onPress={handleUploadToCloud}
+                  disabled={cloudActionLoading}
                 >
-                  <Ionicons name="close" size={24} color="#111827" />
+                  <Ionicons name="globe" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+                  <Text style={styles.cloudButtonText}>Save to Cloud</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.cloudOptionButton, cloudActionLoading && styles.buttonDisabled]}
+                  onPress={handleSendEmailBackup}
+                  disabled={cloudActionLoading}
+                >
+                  <Ionicons name="mail-outline" size={18} color={COLORS.accent} style={{ marginRight: 6 }} />
+                  <Text style={styles.cloudButtonText}>Email Backup</Text>
                 </Pressable>
               </View>
-
-              <Text style={styles.exportModalSubtitle}>
-                Choose a format for your expense data.
-              </Text>
-
-              <Pressable
-                style={styles.exportOption}
-                onPress={() => handleExportData('json')}
-                disabled={exporting}
-              >
-                <View style={[styles.exportOptionIcon, { backgroundColor: '#DCFCE7' }]}>
-                  <Ionicons name="code-slash-outline" size={22} color="#15803D" />
-                </View>
-                <View style={styles.exportOptionTextGroup}>
-                  <Text style={styles.exportOptionTitle}>JSON backup</Text>
-                  <Text style={styles.exportOptionDescription}>
-                    Complete backup of expenses, budget, profile, and preferences. Can be
-                    imported again.
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-              </Pressable>
-
-              <Pressable
-                style={styles.exportOption}
-                onPress={() => handleExportData('csv')}
-                disabled={exporting}
-              >
-                <View style={[styles.exportOptionIcon, { backgroundColor: '#DBEAFE' }]}>
-                  <Ionicons name="grid-outline" size={22} color="#1D4ED8" />
-                </View>
-                <View style={styles.exportOptionTextGroup}>
-                  <Text style={styles.exportOptionTitle}>CSV (.csv)</Text>
-                  <Text style={styles.exportOptionDescription}>
-                    One row per expense. Opens in Excel, Numbers, and Google Sheets.
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-              </Pressable>
-
-              <Pressable
-                style={styles.exportOption}
-                onPress={() => handleExportData('xls')}
-                disabled={exporting}
-              >
-                <View style={[styles.exportOptionIcon, { backgroundColor: '#FEF3C7' }]}>
-                  <Ionicons name="document-text-outline" size={22} color="#B45309" />
-                </View>
-                <View style={styles.exportOptionTextGroup}>
-                  <Text style={styles.exportOptionTitle}>Excel (.xls)</Text>
-                  <Text style={styles.exportOptionDescription}>
-                    Expenses, summary, and profile sheets. Best for reporting.
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-              </Pressable>
-
-              {exporting && (
-                <View style={styles.exportingRow}>
-                  <ActivityIndicator color="#1aaa00" />
-                  <Text style={styles.exportingText}>Preparing your file…</Text>
-                </View>
-              )}
             </View>
           </View>
-        </Modal>
-      </View>
-    </ScrollView>
+
+          {/* Export Success Summary Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={summaryModalVisible}
+            onRequestClose={() => setSummaryModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <Pressable style={styles.modalBackdrop} onPress={() => setSummaryModalVisible(false)} />
+
+              <View style={styles.modalContent}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalHeaderTitle}>Export Successful</Text>
+                  <Pressable onPress={() => setSummaryModalVisible(false)}>
+                    <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+                  </Pressable>
+                </View>
+
+                <Text style={styles.exportModalSubtitle}>
+                  Your notes and productivity JSON backup has been successfully generated and downloaded with the following contents:
+                </Text>
+
+                <View style={styles.summaryList}>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Notes:</Text>
+                    <Text style={styles.summaryValue}>{exportStats.notes}</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Tasks:</Text>
+                    <Text style={styles.summaryValue}>{exportStats.tasks}</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Links:</Text>
+                    <Text style={styles.summaryValue}>{exportStats.links}</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Custom Folders:</Text>
+                    <Text style={styles.summaryValue}>{exportStats.folders}</Text>
+                  </View>
+                </View>
+
+                <Pressable
+                  style={styles.summaryCloseButton}
+                  onPress={() => setSummaryModalVisible(false)}
+                >
+                  <Text style={styles.summaryCloseButtonText}>Done</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#111827',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    marginBottom: 15, 
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 15,
+  scrollContent: {
+    paddingTop: 24,
+    paddingBottom: 110,
   },
-  container: GlobalStyles.mainContainer,
-  scrollContent: GlobalStyles.scrollContent,
   contentWrapper: {
     width: '100%',
-    maxWidth: 900,
+    maxWidth: 800,
     alignSelf: 'center',
   },
   headerContainer: {
-    ...GlobalStyles.headerContainer,
-    marginBottom: 8,
-  } as any,
-  headerTitle: GlobalStyles.pageHeading,
-  headerSubtitle: GlobalStyles.pageSubheading,
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: COLORS.textPrimary,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
   sectionCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    marginTop: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.border,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -856,43 +3797,66 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: COLORS.textPrimary,
   },
   sectionDesc: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     marginBottom: 16,
     lineHeight: 20,
   },
-  comboboxTrigger: {
+  usernameInputRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 10,
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+  },
+  inputTitle: {
+    flex: 1,
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
+    borderColor: COLORS.border,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-  },
-  comboboxTriggerText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1F2937',
+    color: COLORS.textPrimary,
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      } as any,
+    }),
   },
-  currencySymbolBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#FEF3C7',
+  saveUsernameButton: {
+    backgroundColor: COLORS.accent,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
   },
-  currencySymbolText: {
+  saveUsernameButtonText: {
+    color: COLORS.accentText,
+    fontWeight: '800',
+    fontSize: 15,
+  },
+  guideButton: {
+    backgroundColor: COLORS.surfaceElevated,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
+  guideButtonText: {
+    color: COLORS.textPrimary,
+    fontWeight: '700',
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#D97706',
   },
   actionButtonsRow: {
     flexDirection: 'row',
@@ -903,13 +3867,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1aaa00',
+    backgroundColor: COLORS.accent,
     paddingVertical: 14,
     borderRadius: 12,
   },
   exportButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: COLORS.accentText,
+    fontWeight: '800',
     fontSize: 15,
   },
   importButton: {
@@ -917,27 +3881,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: COLORS.surfaceElevated,
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.border,
   },
   importButtonText: {
-    color: '#1F2937',
+    color: COLORS.textPrimary,
     fontWeight: '700',
     fontSize: 15,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   cloudBackupContainer: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: COLORS.border,
   },
   cloudSubheading: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#4B5563',
+    color: COLORS.textSecondary,
     marginBottom: 10,
   },
   cloudButtonsRow: {
@@ -949,145 +3916,93 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingVertical: 10,
+    borderColor: COLORS.border,
+    paddingVertical: 12,
     borderRadius: 10,
   },
   cloudButtonText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  buttonDisabled: {
-    opacity: 0.65,
-  },
-  formatNote: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    marginTop: 14,
-  },
-  formatNoteText: {
-    flex: 1,
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#6B7280',
+    fontWeight: '700',
+    color: COLORS.textPrimary,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFill,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    height: '75%',
+    backgroundColor: COLORS.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 22,
+    width: '100%',
+    maxWidth: 480,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 10,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   modalHeaderTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  modalSearchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 16,
-  },
-  modalSearchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#111827',
-    padding: 0,
-    // @ts-ignore
-    outlineStyle: 'none',
-  } as any,
-  currencyOptionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-    borderRadius: 8,
-  },
-  currencyOptionItemActive: {
-    backgroundColor: '#FEF3C7',
-  },
-  currencyOptionText: {
-    fontSize: 15,
-    color: '#4B5563',
-    fontWeight: '500',
-  },
-  exportModalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 30,
+    fontSize: 20,
+    fontWeight: '800',
+    color: COLORS.textPrimary,
   },
   exportModalSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
+    marginBottom: 16,
     lineHeight: 20,
-    marginBottom: 12,
   },
-  exportOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  exportOptionIcon: {
-    width: 44,
-    height: 44,
+  summaryList: {
+    backgroundColor: COLORS.surfaceElevated,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  exportOptionTextGroup: {
-    flex: 1,
-  },
-  exportOptionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  exportOptionDescription: {
-    fontSize: 12,
-    color: '#6B7280',
-    lineHeight: 17,
-    marginTop: 2,
-  },
-  exportingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+    marginBottom: 20,
     gap: 10,
-    marginTop: 18,
   },
-  exportingText: {
-    fontSize: 13,
-    color: '#4B5563',
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
     fontWeight: '600',
+  },
+  summaryValue: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    fontWeight: '800',
+  },
+  summaryCloseButton: {
+    backgroundColor: COLORS.accent,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryCloseButtonText: {
+    color: COLORS.accentText,
+    fontWeight: '800',
+    fontSize: 15,
   },
 });
 

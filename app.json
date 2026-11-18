@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Money Manager",
-    "slug": "money-manager",
-    "version": "1.3.0",
+    "name": "Notes",
+    "slug": "notes",
+    "version": "1.0.0",
     "orientation": "portrait",
 
     "icon": "./assets/icon.jpeg",
-    "scheme": "money-manager",
+    "scheme": "notes",
     "userInterfaceStyle": "automatic",
 
     "ios": {
       "icon": "./assets/icon.jpeg",
-      "bundleIdentifier": "com.amm0x01.moneymanager",
+      "bundleIdentifier": "com.amm0x01.notes",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.amm0x01.moneymanager"
+      "package": "com.amm0x01.notes"
     },
     "web": {
       "output": "static",

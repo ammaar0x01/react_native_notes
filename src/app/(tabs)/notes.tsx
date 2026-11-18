@@ -1924,7 +1924,7 @@ export default function NotesScreen() {
             </View>
 
             {/* Notes List */}
-            {filteredNotes.length === 0 ? (
+            {/* {filteredNotes.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Ionicons
                   name="document-text-outline"
@@ -1987,7 +1987,62 @@ export default function NotesScreen() {
                   );
                 })}
               </View>
-            )}
+            )} */}
+
+
+            {/* ---newer */}
+            {filteredNotes.map((item) => {
+  const assignedFolder = getFolderById(item.folderId);
+
+  return (
+    <TouchableOpacity
+      key={item.id}
+      style={styles.noteCard}
+      activeOpacity={0.75}
+      onPress={() => openModalForEdit(item)}
+    >
+      {/* <View style={styles.noteAccentBar} /> */}
+      
+      <View style={styles.noteContentContainer}>
+        <Text style={styles.noteTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+
+        <Text style={styles.noteSnippet} numberOfLines={2}>
+          {item.content}
+        </Text>
+        <Text style={styles.noteDate}>{item.updatedAt}</Text>
+      </View>
+
+      {/* Right Column: Folder Badge placed directly above the Delete Icon */}
+      <View style={styles.noteRightActions}>
+        {assignedFolder ? (
+          <View style={styles.noteFolderBadge}>
+            <Ionicons
+              name={assignedFolder.icon}
+              size={11}
+              color={COLORS.accent}
+            />
+            <Text style={styles.noteFolderBadgeText}>
+              {assignedFolder.name}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.badgePlaceholder} />
+        )}
+
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDeleteNote(item.id)}
+          hitSlop={6}
+        >
+          <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+})}
+
           </View>
         </ScrollView>
 
@@ -2169,6 +2224,61 @@ export default function NotesScreen() {
 }
 
 const styles = StyleSheet.create({
+  // --- newer
+noteCard: {
+    flexDirection: 'row',
+    alignItems: 'stretch', // Ensures vertical alignment across items
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
+
+    marginBottom: 20, 
+    padding: 16,
+  },
+  noteContentContainer: {
+    flex: 1,
+    paddingLeft: 12,
+    paddingRight: 12,
+    justifyContent: 'center',
+  },
+  // Right column aligning the folder badge directly above the delete icon
+  noteRightActions: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  noteFolderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceElevated,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+  },
+  noteFolderBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.accent,
+  },
+  badgePlaceholder: {
+    height: 18,
+  },
+  deleteButton: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // =---
+
+
   outerContainer: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -2190,8 +2300,18 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: '800',
+    // fontSize: 28,
+    // fontWeight: '800',
+
+    // ---
+    // fontSize: 40,
+    marginTop: 20, 
+    fontWeight: '400',
+    
+    fontFamily: 'serif',
+    fontSize: 50,
+    // ---
+
     color: COLORS.textPrimary,
   },
   headerSubtitle: {
@@ -2215,7 +2335,9 @@ const styles = StyleSheet.create({
 
   // Folders Bar
   foldersSection: {
-    marginBottom: 16,
+    // marginBottom: 16,
+        marginTop: 12,
+    marginBottom: 20,
   },
   foldersScrollContent: {
     gap: 8,
@@ -2285,7 +2407,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 48,
-    marginBottom: 20,
+
+    marginTop: 10, 
+    marginBottom: 30,
   },
   searchIcon: {
     marginRight: 10,
@@ -2323,18 +2447,20 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   listContainer: {
-    gap: 12,
+    gap: 14,
   },
-  noteCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 16,
-    overflow: 'hidden',
-  },
+
+
+  // noteCard: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: COLORS.surface,
+  //   borderRadius: 14,
+  //   borderWidth: 1,
+  //   borderColor: COLORS.border,
+  //   padding: 16,
+  //   overflow: 'hidden',
+  // },
   noteAccentBar: {
     width: 4,
     height: '100%',
@@ -2342,10 +2468,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     marginRight: 14,
   },
-  noteContentContainer: {
-    flex: 1,
-    paddingRight: 12,
-  },
+  // noteContentContainer: {
+  //   flex: 1,
+  //   paddingRight: 12,
+  // },
   noteTopMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2359,22 +2485,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.textPrimary,
   },
-  noteFolderBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    gap: 4,
-  },
-  noteFolderBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: COLORS.accent,
-  },
+  // noteFolderBadge: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: COLORS.surfaceElevated,
+  //   borderWidth: 1,
+  //   borderColor: COLORS.border,
+  //   paddingHorizontal: 8,
+  //   paddingVertical: 3,
+  //   borderRadius: 12,
+  //   gap: 4,
+  // },
+  // noteFolderBadgeText: {
+  //   fontSize: 11,
+  //   fontWeight: '700',
+  //   color: COLORS.accent,
+  // },
   noteSnippet: {
     fontSize: 14,
     color: COLORS.textSecondary,
@@ -2386,11 +2512,11 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     fontWeight: '600',
   },
-  deleteButton: {
-    padding: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-  },
+  // deleteButton: {
+  //   padding: 8,
+  //   borderRadius: 10,
+  //   backgroundColor: 'rgba(239, 68, 68, 0.12)',
+  // },
   fab: {
     position: 'absolute',
     right: 24,

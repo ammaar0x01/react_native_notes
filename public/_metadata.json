@@ -1,11 +1,13 @@
 {
-    "app_name": "Money Manager", 
+    "app_name": "Notes", 
     "app_type": "cross-platform; (Web-app and Android app)",
     
-    "started": "2026-10-29",
-    "updated": "2026-10-31",
+    "started": "2026-11-17",
+    "updated": "2026-11-18",
     "status": "work-in-progress",
-    "version": "1.2.0", 
+    "version_dev": "0.1", 
+    "version_release": "1.0.0", 
+
     "notes": [
         "Expo version: 57", 
         "Sitemap URL: http://localhost:8081/_sitemap"
@@ -19,7 +21,8 @@
     "tools_used": [
         "Visual Studio Code", 
         "https://gemini.google.com/app",
-        "https://opencode.ai/", 
-        "https://lucide.dev/icons/wallet" 
+        "https://opencode.ai", 
+        "https://lucide.dev/icons/wallet", 
+        "https://www.pexels.com" 
     ]
 }
