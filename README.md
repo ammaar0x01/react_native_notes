@@ -2,7 +2,7 @@
 
 - Started:                 2026-11-17
 - Updated:                 2026-11-18
-- Version (development):   0.1
+- Version (development):   0.2
 - Version (release):       1.0.0
 - Status:                  work-in-progress
 ---

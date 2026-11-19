@@ -18,9 +18,71 @@ const COLORS = {
   danger: "#EF4444",
 };
 
+
 // --- Common styles across the 4 main pages
 const stylesCommon = StyleSheet.create({
-    // === BODY 
+  
+  
+// ------------------
+
+
+  headerTitle: {
+    // fontSize: 28,
+    // fontWeight: '800',
+
+    // ---
+     marginTop: 20, 
+    fontWeight: '400',
+    
+    fontFamily: 'serif',
+    fontSize: 50,
+    // ---
+
+    color: COLORS.textPrimary,
+  },
+  
+
+   // Folders Bar
+  foldersSection: {
+    // marginBottom: 16,
+        marginTop: 12,
+    marginBottom: 20,
+  },
+
+    searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 48,
+
+    marginTop: 10, 
+    marginBottom: 30,
+  },
+
+
+noteCard: {
+    flexDirection: 'row',
+    alignItems: 'stretch', // Ensures vertical alignment across items
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
+
+    marginBottom: 20, 
+    padding: 16,
+  },
+
+// ------------------
+
+
+
+  
+  // === BODY 
   outerContainer: {
     flex: 1,
     backgroundColor: COLORS.bg,
