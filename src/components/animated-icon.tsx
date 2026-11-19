@@ -44,8 +44,7 @@ export function AnimatedSplashOverlay() {
     >
       <Image
         style={styles.image}
-        // source={require("@/assets/splash-icon.png")}
-        source={require("@/assets/icon-splash.png")}
+        source={ require("@/assets/logo-foreground.png") }
         contentFit="contain"
       />
     </Animated.View>

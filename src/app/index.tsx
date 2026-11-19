@@ -18,10 +18,6 @@ import Head from 'expo-router/head';
 
 const HERO_IMAGE = require('@/images/hero.jpg');
 
-// const HERO_IMAGE = require('@/images/img2.jpg');
-// const HERO_IMAGE = require('@/images/img3.jpg');
-// const HERO_IMAGE = require('@/images/img5.jpg');
-
 
 const CHATBOT_PROMPT = `You are a data transformation assistant for "Notes", an offline-first React Native notes, tasks, and bookmarks productivity app.
 
@@ -157,7 +153,7 @@ export default function LandingScreen() {
             hoverStyle={styles.navLaunchButtonHover}
             pressedStyle={styles.navLaunchButtonPressed}
             accessibilityLabel="Open the Notes app"
-            onPress={() => router.replace('/' as any)}
+            onPress={() => router.replace('/app' as any)}
           >
             <Text style={styles.navLaunchButtonText}>Go to App</Text>
             <Ionicons name="arrow-forward" size={16} color={COLORS.accentText} style={{ marginLeft: 6 }} />
@@ -187,10 +183,10 @@ export default function LandingScreen() {
                   style={styles.primaryButton}
                   hoverStyle={styles.primaryButtonHover}
                   pressedStyle={styles.primaryButtonPressed}
-                  accessibilityLabel="Open workspace"
-                  onPress={() => router.replace('/' as any)}
+                  accessibilityLabel="Open Notes"
+                  onPress={() => router.replace('/app/notes' as any)}
                 >
-                  <Text style={styles.primaryButtonText}>Open Workspace</Text>
+                  <Text style={styles.primaryButtonText}>Open Notes</Text>
                   <Ionicons name="arrow-forward" size={18} color={COLORS.accentText} style={{ marginLeft: 8 }} />
                 </HoverPressable>
 
@@ -406,9 +402,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 18,
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+
+    // backgroundColor: COLORS.surface,
+    // backgroundColor: '#280900',
+
+    // borderBottomWidth: 1,
+    // borderBottomColor: COLORS.border,
     zIndex: 10,
   },
   brandContainer: {

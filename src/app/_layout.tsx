@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, Octicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import "@/global";
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
@@ -104,34 +104,14 @@ export default function Layout() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const isLandingPage = pathname === "/landing";
+  const isLandingPage = pathname === "/";
   const isWeb = Platform.OS === "web";
   const isDesktop = isWeb && width >= 768;
-  const isMobileApp = !isWeb; // Native iOS / Android app version
-  const showBottomBar = !isDesktop && !isLandingPage; // Native app + small-width web
+  const isMobileApp = !isWeb; 
+  const showBottomBar = !isDesktop && !isLandingPage; 
 
   const bottomPadding = isWeb ? 8 : Math.max(insets.bottom, 12);
   const totalBarHeight = 62 + bottomPadding;
-
-  // Record the first time the app was opened, for the profile page.
-  // useEffect(() => {
-  //   const recordFirstUse = async () => {
-  //     try {
-  //       const firstUsed = await AsyncStorage.getItem(STORAGE_KEYS.firstUsed);
-  //       if (!firstUsed) {
-  //         await AsyncStorage.setItem(
-  //           STORAGE_KEYS.firstUsed,
-  //           new Date().toISOString(),
-  //         );
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to record first use date", error);
-  //     }
-  //   };
-
-  //   recordFirstUse();
-  // }, []);
-
 
   // --- for reminder
   useEffect(() => {
@@ -148,24 +128,25 @@ export default function Layout() {
   
   // --- Sidebar items for desktop web navigation
   const sidebarNavItems = [
-    {
+     {
       label: "Notes",
-      path: "/",
+      path: "/app/notes",
       icon: <Ionicons name="pencil" size={24} color="white" />,
     },
+
     {
       label: "Tasks",
-      path: "/tasks",
+      path: "/app/tasks",
       icon: <Ionicons name="checkbox" size={24} color="white" />,
     },
     {
       label: "Links",
-      path: "/links",
+      path: "/app/links",
       icon: <Ionicons name="link" size={24} color="white" />,
     },
     {
       label: "Settings",
-      path: "/settings",
+      path: "/app/settings",
       icon: <Ionicons name="settings-outline" size={24} color="white" />,
     },
   ];
@@ -226,7 +207,7 @@ export default function Layout() {
               </View>
 
               <TouchableOpacity
-                onPress={() => router.push("/landing" as any)}
+                onPress={() => router.push("/" as any)}
                 style={{ padding: 10, borderRadius: 12 }}
               >
                 <Octicons name="arrow-left" size={22} color="white" />
@@ -275,8 +256,9 @@ export default function Layout() {
                 },
               }}
             >
+
               <Tabs.Screen
-                name="(tabs)/index"
+                name="app/notes"
                 options={{
                   title: "Notes",
                   tabBarIcon: ({ color }) => (
@@ -285,7 +267,7 @@ export default function Layout() {
                 }}
               />
               <Tabs.Screen
-                name="(tabs)/tasks"
+                name="app/tasks"
                 options={{
                   title: "Tasks",
                   tabBarIcon: ({ color }) => (
@@ -295,7 +277,7 @@ export default function Layout() {
               />
 
               <Tabs.Screen
-                name="(tabs)/links"
+                name="app/links"
                 options={{
                   title: "Links",
                   tabBarIcon: ({ color }) => (
@@ -306,7 +288,7 @@ export default function Layout() {
               />
 
               <Tabs.Screen
-                name="settings"
+                name="app/settings"
                 options={{
                   title: "Settings",
                   tabBarIcon: ({ color }) => (
@@ -316,7 +298,9 @@ export default function Layout() {
               />
 
               {/* === Hidden auxiliary screens so they don't generate bottom tab buttons */}
-              <Tabs.Screen name="landing" options={{ href: null }} />
+              <Tabs.Screen name="index" options={{ href: null }} />
+              <Tabs.Screen name="app/index" options={{ href: null }} />
+            
             </Tabs>
           </View>
         </View>

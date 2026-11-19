@@ -474,7 +474,7 @@ export default function SettingsScreen() {
             <View style={styles.usernameInputRow}>
               <TextInput
                 style={styles.inputTitle}
-                placeholder="Enter your username..."
+                placeholder="Your username..."
                 placeholderTextColor={COLORS.textMuted}
                 value={usernameInput}
                 onChangeText={setUsernameInput}
@@ -503,7 +503,7 @@ export default function SettingsScreen() {
             </Text>
 
             <Pressable
-              onPress={() => router.push('/landing?scrollTo=import' as any)}
+              onPress={() => router.push('/?scrollTo=import' as any)}
               style={styles.guideButton}
             >
               <Text style={styles.guideButtonText}>JSON Import Guide</Text>
@@ -515,14 +515,19 @@ export default function SettingsScreen() {
                 onPress={handleExportJson}
                 disabled={exporting}
               >
-                {exporting ? (
+                {exporting 
+                ? (
                   <ActivityIndicator color={COLORS.accentText} size="small" />
-                ) : (
-                  <Ionicons name="download-outline" size={18} color={COLORS.accentText} style={{ marginRight: 8 }} />
-                )}
-                <Text style={styles.exportButtonText}>
+                ) 
+                : (
+                  
+                  // <Ionicons name="download-outline" size={18} color={COLORS.accentText} style={{ marginRight: 8 }} />
+                
+                     <Text style={styles.exportButtonText}>
                   {exporting ? 'Exporting…' : 'Export JSON'}
                 </Text>
+                )}
+             
               </Pressable>
 
               <Pressable
@@ -530,19 +535,28 @@ export default function SettingsScreen() {
                 onPress={handleImportData}
                 disabled={importing}
               >
-                {importing ? (
+                {importing 
+                ? (
                   <ActivityIndicator color={COLORS.textPrimary} size="small" />
-                ) : (
-                  <Ionicons
+                ) 
+                : (
+                  <>
+                  {/* <Ionicons
                     name="cloud-upload-outline"
                     size={18}
                     color={COLORS.textPrimary}
                     style={{ marginRight: 8 }}
-                  />
-                )}
-                <Text style={styles.importButtonText}>
+                  /> */}
+                   <Text style={styles.importButtonText}>
                   {importing ? 'Importing…' : 'Import JSON'}
                 </Text>
+
+                </>
+                )}
+
+                {/* <Text style={styles.importButtonText}>
+                  {importing ? 'Importing…' : 'Import JSON'}
+                </Text> */}
               </Pressable>
             </View>
 
@@ -664,13 +678,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 10, 
   },
+
+
   sectionCard: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    // borderWidth: 1,
+    // borderColor: COLORS.border,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -679,8 +695,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    // fontWeight: '600',
     color: COLORS.textPrimary,
+    fontFamily: 'serif', 
   },
   sectionDesc: {
     fontSize: 14,
@@ -688,13 +705,50 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 20,
   },
+  // usernameInputRow: {
+  //   flexDirection: 'row',
+  //   gap: 10,
+  //   alignItems: 'center',
+  // },
+  // inputTitle: {
+  //   flex: 1,
+  //   backgroundColor: COLORS.surfaceElevated,
+  //   borderWidth: 1,
+  //   borderColor: COLORS.border,
+  //   borderRadius: 10,
+  //   paddingHorizontal: 14,
+  //   paddingVertical: 12,
+  //   fontSize: 15,
+  //   // color: COLORS.textPrimary,
+
+  //   // ...Platform.select({
+  //   //   web: {
+  //   // // fontSize: 20,
+
+  //   //     outlineStyle: 'none',
+  //   //   } as any,
+  //   // }),
+  // // },
+
+  //   fontFamily: 'serif', 
+  //   // fontWeight: '600',
+
+  //   fontWeight: '400',
+  //   // fontSize: 20, 
+  //   color: '#ebfb08',
+  // },
+
+//---
+
   usernameInputRow: {
     flexDirection: 'row',
     gap: 10,
     alignItems: 'center',
+    width: '100%',
   },
   inputTitle: {
     flex: 1,
+    minWidth: 0, // Allows the TextInput to shrink below its intrinsic width on small screens
     backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -702,15 +756,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
+    // fontWeight: '600',
+    // color: COLORS.textPrimary,
+
     ...Platform.select({
       web: {
         outlineStyle: 'none',
       } as any,
     }),
+
+    fontFamily: 'serif', 
+    fontWeight: '400',
+    color: '#ebfb08',
   },
   saveUsernameButton: {
+    flexShrink: 0, // Ensures the button never gets squished or pushed off-screen
     backgroundColor: COLORS.accent,
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -718,18 +778,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+//---
+
+
+  // saveUsernameButton: {
+  //   backgroundColor: COLORS.accent,
+  //   paddingHorizontal: 20,
+  //   paddingVertical: 12,
+  //   borderRadius: 10,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
   saveUsernameButtonText: {
     color: COLORS.accentText,
     fontWeight: '800',
     fontSize: 15,
   },
   guideButton: {
-    backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginBottom: 16,
+    // backgroundColor: COLORS.surfaceElevated,
+    // borderWidth: 1,
+    // borderColor: COLORS.border,
+
+    // paddingHorizontal: 20,
+    // paddingVertical: 12,
+
+    // marginTop: 1, 
+    marginBottom: 30,
+
     borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -740,6 +816,7 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     fontWeight: '700',
     fontSize: 14,
+    textDecorationLine:'underline', 
   },
   actionButtonsRow: {
     flexDirection: 'row',

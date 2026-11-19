@@ -1,8 +1,8 @@
 # Notes 
 
 - Started:                 2026-11-17
-- Updated:                 2026-11-18
-- Version (development):   0.2
+- Updated:                 2026-11-19
+- Version (development):   0.3
 - Version (release):       1.0.0
 - Status:                  work-in-progress
 ---
@@ -17,12 +17,20 @@
 
 
 ## Screenshots
-Here is a quick preview of UI on the mobile app:
-|                       Expenses                        |                      Monthly                       |                       Notes                        |
-| :---------------------------------------------------: | :------------------------------------------------: | :------------------------------------------------: |
-| ![Landing Page](/public/screenshots/mobile-app1.jpeg) | ![Home View](/public/screenshots/mobile-app2.jpeg) | ![Home View](/public/screenshots/mobile-app3.jpeg) |
 
+### Desktop View
+
+![Notes View](/public/screenshots/desktop1.png) 
+![Tasks View](/public/screenshots/desktop2.png) 
+![Links View](/public/screenshots/desktop3.png) 
+
+
+### Mobile App
+| Landing Page | Notes & Tasks | Links & Settings |
+| :---: | :---: | :---: |
+| ![Landing Page](/public/screenshots/phone1.jpeg) | ![Notes & Tasks](/public/screenshots/phone2.jpeg) | ![Links & Settings](/public/screenshots/phone3.jpeg) |
 ---
+
 
 
 ## Installation and Execution
@@ -93,9 +101,10 @@ Different files have different naming styles
 ## Learn more
 To learn more: [Expo documentation](https://docs.expo.dev/)
 
-> Create a new project
-
-`npx create-expo-app@latest`
+```
+# Create a new project
+npx create-expo-app@latest
+```
 
 
 ### Build and export a React native app

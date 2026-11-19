@@ -16,11 +16,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Head from 'expo-router/head';
+
 import { LinkifiedText, HorizontalScrollBar } from '@/components/text-helpers';
+// -------------------------------------------
 
-const TASKS_STORAGE_KEY = '@tasks_app_data';
-const TASK_FOLDERS_STORAGE_KEY = '@tasks_app_folders';
+const STORAGE_KEY = '@notes_app_data';
+const FOLDERS_STORAGE_KEY = '@notes_app_folders';
 
+// Theme Palette
 const COLORS = {
   bg: '#0F1115',
   surface: '#1A1D24',
@@ -29,17 +32,15 @@ const COLORS = {
   textPrimary: '#FFFFFF',
   textSecondary: '#9CA3AF',
   textMuted: '#6B7280',
-  accent: '#F59E0B',
+  accent: '#F59E0B', // Yellow-Orange
   accentText: '#111827',
-  success: '#10B981',
   danger: '#EF4444',
 };
 
-interface Task {
+interface Note {
   id: string;
   title: string;
-  description: string;
-  completed: boolean;
+  content: string;
   updatedAt: string;
   folderId?: string | null;
 }
@@ -53,23 +54,22 @@ interface Folder {
 
 const PREDEFINED_FOLDERS: Folder[] = [
   { id: 'favourites', name: 'Favourites', icon: 'star', isPredefined: true },
-  { id: 'day', name: 'Day', icon: 'today', isPredefined: true },
-  { id: 'week', name: 'Week', icon: 'calendar', isPredefined: true },
-  { id: 'month', name: 'Month', icon: 'calendar-number', isPredefined: true },
+  { id: 'ideas', name: 'Ideas', icon: 'bulb', isPredefined: true },
 ];
 
-export default function TasksScreen() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export default function NotesScreen() {
+  const [notes, setNotes] = useState<Note[]>([]);
   const [folders, setFolders] = useState<Folder[]>(PREDEFINED_FOLDERS);
   const [selectedFolderId, setSelectedFolderId] = useState<string>('all');
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [currentNoteId, setCurrentNoteId] = useState<string | null>(null);
   const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [taskFolderId, setTaskFolderId] = useState<string | null>(null);
+  const [content, setContent] = useState<string>('');
+  const [noteFolderId, setNoteFolderId] = useState<string | null>(null);
 
+  // Folder Create/Edit Modal State
   const [folderModalVisible, setFolderModalVisible] = useState<boolean>(false);
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null);
   const [folderNameInput, setFolderNameInput] = useState<string>('');
@@ -83,13 +83,13 @@ export default function TasksScreen() {
 
   const loadData = async () => {
     try {
-      const [storedTasks, storedFolders] = await Promise.all([
-        AsyncStorage.getItem(TASKS_STORAGE_KEY),
-        AsyncStorage.getItem(TASK_FOLDERS_STORAGE_KEY),
+      const [storedNotes, storedFolders] = await Promise.all([
+        AsyncStorage.getItem(STORAGE_KEY),
+        AsyncStorage.getItem(FOLDERS_STORAGE_KEY),
       ]);
 
-      if (storedTasks !== null) {
-        setTasks(JSON.parse(storedTasks) as Task[]);
+      if (storedNotes !== null) {
+        setNotes(JSON.parse(storedNotes) as Note[]);
       }
 
       if (storedFolders !== null) {
@@ -97,29 +97,32 @@ export default function TasksScreen() {
         setFolders([...PREDEFINED_FOLDERS, ...customFolders]);
       }
     } catch (error) {
-      console.error('Failed to load tasks or folders.', error);
+      console.error('Failed to load notes or folders.', error);
     }
   };
 
-  const saveTasksToStorage = async (updatedTasks: Task[]) => {
+  const saveNotesToStorage = async (updatedNotes: Note[]) => {
     try {
-      await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updatedTasks));
-      setTasks(updatedTasks);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedNotes));
+      setNotes(updatedNotes);
     } catch (error) {
-      console.error('Failed to save tasks.', error);
+      console.error('Failed to save notes.', error);
     }
   };
 
   const saveCustomFoldersToStorage = async (allFolders: Folder[]) => {
     try {
       const customOnly = allFolders.filter((f) => !f.isPredefined);
-      await AsyncStorage.setItem(TASK_FOLDERS_STORAGE_KEY, JSON.stringify(customOnly));
+      await AsyncStorage.setItem(FOLDERS_STORAGE_KEY, JSON.stringify(customOnly));
       setFolders(allFolders);
     } catch (error) {
-      console.error('Failed to save task folders.', error);
+      console.error('Failed to save folders.', error);
     }
   };
 
+  // ----------------------------------
+  // Folder CRUD Handlers
+  // ----------------------------------
   const openCreateFolderModal = () => {
     setEditingFolder(null);
     setFolderNameInput('');
@@ -142,8 +145,11 @@ export default function TasksScreen() {
   const handleSaveFolder = async () => {
     const trimmed = folderNameInput.trim();
     if (!trimmed) {
-      if (Platform.OS === 'web') window.alert('Folder name cannot be empty.');
-      else Alert.alert('Validation', 'Folder name cannot be empty.');
+      if (Platform.OS === 'web') {
+        window.alert('Folder name cannot be empty.');
+      } else {
+        Alert.alert('Validation', 'Folder name cannot be empty.');
+      }
       return;
     }
 
@@ -151,8 +157,11 @@ export default function TasksScreen() {
       (f) => f.name.toLowerCase() === trimmed.toLowerCase() && f.id !== editingFolder?.id
     );
     if (duplicate) {
-      if (Platform.OS === 'web') window.alert('A folder with this name already exists.');
-      else Alert.alert('Duplicate', 'A folder with this name already exists.');
+      if (Platform.OS === 'web') {
+        window.alert('A folder with this name already exists.');
+      } else {
+        Alert.alert('Duplicate', 'A folder with this name already exists.');
+      }
       return;
     }
 
@@ -163,7 +172,7 @@ export default function TasksScreen() {
       await saveCustomFoldersToStorage(updatedFolders);
     } else {
       const newFolder: Folder = {
-        id: `task_folder_${Date.now()}`,
+        id: `folder_${Date.now()}`,
         name: trimmed,
         icon: 'folder',
         isPredefined: false,
@@ -182,10 +191,11 @@ export default function TasksScreen() {
       const updatedFolders = folders.filter((f) => f.id !== folder.id);
       await saveCustomFoldersToStorage(updatedFolders);
 
-      const updatedTasks = tasks.map((t) =>
-        t.folderId === folder.id ? { ...t, folderId: null } : t
+      // Unassign notes in this folder rather than deleting them
+      const updatedNotes = notes.map((n) =>
+        n.folderId === folder.id ? { ...n, folderId: null } : n
       );
-      await saveTasksToStorage(updatedTasks);
+      await saveNotesToStorage(updatedNotes);
 
       if (selectedFolderId === folder.id) {
         setSelectedFolderId('all');
@@ -193,13 +203,14 @@ export default function TasksScreen() {
     };
 
     if (Platform.OS === 'web') {
-      if (window.confirm(`Delete folder "${folder.name}"? Tasks inside will remain in All.`)) {
-        performDelete();
-      }
+      const confirmed = window.confirm(
+        `Delete folder "${folder.name}"? Notes inside will remain in All Notes.`
+      );
+      if (confirmed) performDelete();
     } else {
       Alert.alert(
         'Delete Folder',
-        `Delete "${folder.name}"? Tasks inside will remain in All.`,
+        `Delete "${folder.name}"? Notes inside will remain in All Notes.`,
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Delete', style: 'destructive', onPress: performDelete },
@@ -208,133 +219,112 @@ export default function TasksScreen() {
     }
   };
 
-  const handleSaveTask = () => {
-    if (!title.trim()) {
-      if (Platform.OS === 'web') window.alert('Task title cannot be empty.');
-      else Alert.alert('Validation', 'Task title cannot be empty.');
+  // ----------------------------------
+  // Note CRUD Handlers
+  // ----------------------------------
+  const handleSaveNote = () => {
+    if (!title.trim() && !content.trim()) {
+      if (Platform.OS === 'web') {
+        window.alert('Note cannot be empty.');
+      } else {
+        Alert.alert('Validation', 'Note cannot be empty.');
+      }
       return;
     }
 
     const timestamp = new Date().toLocaleString();
 
-    if (currentTaskId) {
-      const updatedTasks: Task[] = tasks.map((task) =>
-        task.id === currentTaskId
+    if (currentNoteId) {
+      const updatedNotes: Note[] = notes.map((note) =>
+        note.id === currentNoteId
           ? {
-              ...task,
-              title: title.trim(),
-              description: description.trim(),
+              ...note,
+              title: title.trim() || 'Untitled Note',
+              content: content.trim(),
               updatedAt: timestamp,
-              folderId: taskFolderId,
+              folderId: noteFolderId,
             }
-          : task
+          : note
       );
-      saveTasksToStorage(updatedTasks);
+      saveNotesToStorage(updatedNotes);
     } else {
-      const newTask: Task = {
+      const newNote: Note = {
         id: Date.now().toString(),
-        title: title.trim(),
-        description: description.trim(),
-        completed: false,
+        title: title.trim() || 'Untitled Note',
+        content: content.trim(),
         updatedAt: timestamp,
-        folderId: taskFolderId,
+        folderId: noteFolderId,
       };
-      saveTasksToStorage([newTask, ...tasks]);
+      saveNotesToStorage([newNote, ...notes]);
     }
 
     closeModal();
   };
 
-  const handleToggleComplete = (id: string) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    );
-    saveTasksToStorage(updatedTasks);
-  };
-
-  const handleDeleteTask = (id: string) => {
+  const handleDeleteNote = (id: string) => {
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to delete this task?')) {
-        saveTasksToStorage(tasks.filter((task) => task.id !== id));
+      const confirmed = window.confirm('Are you sure you want to delete this note?');
+      if (confirmed) {
+        const updatedNotes: Note[] = notes.filter((note) => note.id !== id);
+        saveNotesToStorage(updatedNotes);
       }
     } else {
-      Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
+      Alert.alert('Delete Note', 'Are you sure you want to delete this note?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => saveTasksToStorage(tasks.filter((task) => task.id !== id)),
+          onPress: () => {
+            const updatedNotes: Note[] = notes.filter((note) => note.id !== id);
+            saveNotesToStorage(updatedNotes);
+          },
         },
       ]);
     }
   };
 
-  const handleClearCompleted = () => {
-    const completedCount = filteredTasks.filter((t) => t.completed).length;
-    if (completedCount === 0) return;
-
-    const performClear = () => {
-      const remaining = tasks.filter((task) => {
-        const inCurrentView =
-          selectedFolderId === 'all' || task.folderId === selectedFolderId;
-        return !(inCurrentView && task.completed);
-      });
-      saveTasksToStorage(remaining);
-    };
-
-    if (Platform.OS === 'web') {
-      if (window.confirm(`Clear ${completedCount} completed task(s)?`)) performClear();
-    } else {
-      Alert.alert('Clear Completed', `Remove ${completedCount} completed task(s)?`, [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear', style: 'destructive', onPress: performClear },
-      ]);
-    }
-  };
-
-  const openModalForEdit = (task: Task) => {
-    setCurrentTaskId(task.id);
-    setTitle(task.title);
-    setDescription(task.description);
-    setTaskFolderId(task.folderId ?? null);
+  const openModalForEdit = (note: Note) => {
+    setCurrentNoteId(note.id);
+    setTitle(note.title);
+    setContent(note.content);
+    setNoteFolderId(note.folderId ?? null);
     setModalVisible(true);
   };
 
   const openModalForCreate = () => {
-    setCurrentTaskId(null);
+    setCurrentNoteId(null);
     setTitle('');
-    setDescription('');
-    setTaskFolderId(selectedFolderId === 'all' ? 'day' : selectedFolderId);
+    setContent('');
+    setNoteFolderId(selectedFolderId === 'all' ? null : selectedFolderId);
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setCurrentTaskId(null);
+    setCurrentNoteId(null);
     setTitle('');
-    setDescription('');
-    setTaskFolderId(null);
+    setContent('');
+    setNoteFolderId(null);
   };
 
-  const filteredTasks = tasks
-    .filter((task) => {
-      const matchesFolder =
-        selectedFolderId === 'all' || task.folderId === selectedFolderId;
-      const matchesSearch =
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesFolder && matchesSearch;
-    })
-    .sort((a, b) => Number(a.completed) - Number(b.completed));
+  const filteredNotes = notes.filter((note) => {
+    const matchesFolder =
+      selectedFolderId === 'all' || note.folderId === selectedFolderId;
+    const matchesSearch =
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFolder && matchesSearch;
+  });
 
-  const completedInView = filteredTasks.filter((t) => t.completed).length;
-  const getFolderById = (id?: string | null) => folders.find((f) => f.id === id);
+  const getFolderById = (id?: string | null) =>
+    folders.find((f) => f.id === id);
+
   const activeFolderObj = folders.find((f) => f.id === selectedFolderId);
 
   return (
     <>
       <Head>
-        <title>My Tasks</title>
+        <title>My Notes</title>
       </Head>
 
       <KeyboardAvoidingView
@@ -349,34 +339,28 @@ export default function TasksScreen() {
             {/* Header */}
             <View style={styles.headerContainer}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.headerTitle}>My Tasks</Text>
+                <Text style={styles.headerTitle}>My Notes</Text>
                 <Text style={styles.headerSubtitle}>
-                  Plan and track your daily, weekly, and monthly tasks
+                  Organize your notes and ideas
                 </Text>
               </View>
 
-              <View style={styles.headerRightActions}>
-                {completedInView > 0 && (
-                  <TouchableOpacity
-                    style={styles.clearCompletedBtn}
-                    onPress={handleClearCompleted}
-                  >
-                    <Ionicons name="checkmark-done" size={14} color={COLORS.textSecondary} />
-                    <Text style={styles.clearCompletedText}>Clear done</Text>
-                  </TouchableOpacity>
-                )}
-
-                <View style={styles.countBadge}>
-                  <Text style={styles.taskCount}>
-                    {completedInView}/{filteredTasks.length} done
-                  </Text>
-                </View>
+              <View style={styles.countBadge}>
+                <Text style={styles.noteCount}>
+                  {filteredNotes.length}{' '}
+                  {filteredNotes.length === 1 ? 'note' : 'notes'}
+                </Text>
               </View>
             </View>
 
-            {/* Folders Horizontal Bar (Supports mouse-wheel horizontal scroll on web) */}
+            {/* Folders Horizontal Bar */}
             <View style={styles.foldersSection}>
-              <HorizontalScrollBar contentContainerStyle={styles.foldersScrollContent}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.foldersScrollContent}
+              >
+                {/* All Notes Tab */}
                 <TouchableOpacity
                   style={[
                     styles.folderChip,
@@ -399,74 +383,19 @@ export default function TasksScreen() {
                       selectedFolderId === 'all' && styles.folderChipTextActive,
                     ]}
                   >
-                    All ({tasks.length})
+                    All ({notes.length})
                   </Text>
                 </TouchableOpacity>
 
+                {/* Predefined & Custom Folders */}
 
-                {/* {folders.map((folder) => {
-                  const isSelected = selectedFolderId === folder.id;
-                  const count = tasks.filter((t) => t.folderId === folder.id).length;
-
-                  return (
-                    <TouchableOpacity
-                      key={folder.id}
-                      style={[
-                        styles.folderChip,
-                        isSelected && styles.folderChipActive,
-                      ]}
-                      onPress={() => setSelectedFolderId(folder.id)}
-                    >
-                      <Ionicons
-                        name={folder.icon}
-                        size={15}
-                        color={isSelected ? COLORS.accentText : COLORS.accent}
-                      />
-                      <Text
-                        style={[
-                          styles.folderChipText,
-                          isSelected && styles.folderChipTextActive,
-                        ]}
-                      >
-                        {folder.name} ({count})
-                      </Text>
-
-                      {!folder.isPredefined && (
-                        <View style={styles.folderChipActions}>
-                          <TouchableOpacity
-                            onPress={() => openEditFolderModal(folder)}
-                            hitSlop={6}
-                            style={styles.folderMiniAction}
-                          >
-                            <Ionicons
-                              name="pencil"
-                              size={13}
-                              color={
-                                isSelected ? COLORS.accentText : COLORS.textSecondary
-                              }
-                            />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => handleDeleteFolder(folder)}
-                            hitSlop={6}
-                            style={styles.folderMiniAction}
-                          >
-                            <Ionicons
-                              name="trash"
-                              size={13}
-                              color={isSelected ? COLORS.accentText : COLORS.danger}
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  );
-                })} */}
-
-{/* newer */}
+                {/* --- newer */}
 {folders.map((folder) => {
-  const isSelected = selectedFolderId === folder.id;
-  const count = tasks.filter((t) => t.folderId === folder.id).length;
+         const isSelected = selectedFolderId === folder.id;
+                  const count = notes.filter((n) => n.folderId === folder.id).length;
+
+  // const isSelected = selectedFolderId === folder.id;
+  // const count = tasks.filter((t) => t.folderId === folder.id).length;
   const isFavourites = folder.id === 'favourites';
 
   return (
@@ -529,6 +458,8 @@ export default function TasksScreen() {
   );
 })}
 
+
+                {/* Add Folder Button */}
                 <TouchableOpacity
                   style={styles.addFolderChip}
                   onPress={openCreateFolderModal}
@@ -536,7 +467,7 @@ export default function TasksScreen() {
                   <Ionicons name="add" size={16} color={COLORS.accent} />
                   <Text style={styles.addFolderChipText}>New Folder</Text>
                 </TouchableOpacity>
-              </HorizontalScrollBar>
+              </ScrollView>
             </View>
 
             {/* Search Bar */}
@@ -552,7 +483,7 @@ export default function TasksScreen() {
                 placeholder={
                   activeFolderObj
                     ? `Search in ${activeFolderObj.name}...`
-                    : 'Search all tasks...'
+                    : 'Search all notes...'
                 }
                 placeholderTextColor={COLORS.textMuted}
                 value={searchQuery}
@@ -565,114 +496,83 @@ export default function TasksScreen() {
               )}
             </View>
 
-            {/* Tasks List */}
-            {filteredTasks.length === 0 ? (
+            {/* Notes List */}
+            {filteredNotes.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Ionicons
-                  name="checkbox-outline"
+                  name="pencil"
                   size={64}
                   color={COLORS.border}
                 />
                 <Text style={styles.emptyText}>
                   {activeFolderObj
-                    ? `No tasks in "${activeFolderObj.name}"`
-                    : 'No tasks found'}
+                    ? `No notes in "${activeFolderObj.name}"`
+                    : 'No notes found'}
                 </Text>
                 <Text style={styles.emptySubtext}>
-                  Tap the + button below to add a task.
+                  Tap the + button below to add a note.
                 </Text>
               </View>
             ) : (
               <View style={styles.listContainer}>
-                {filteredTasks.map((item) => {
-                  const assignedFolder = getFolderById(item.folderId);
+            
+            {filteredNotes.map((item) => {
+  const assignedFolder = getFolderById(item.folderId);
 
-                  return (
-                    <View
-                      key={item.id}
-                      style={[
-                        styles.taskCard,
-                        item.completed && styles.taskCardCompleted,
-                      ]}
-                    >
-                      {/* Checkbox Button */}
-                      <TouchableOpacity
-                        style={[
-                          styles.checkbox,
-                          item.completed && styles.checkboxChecked,
-                        ]}
-                        onPress={() => handleToggleComplete(item.id)}
-                        activeOpacity={0.7}
-                      >
-                        {item.completed && (
-                          <Ionicons
-                            name="checkmark"
-                            size={16}
-                            color={COLORS.accentText}
-                          />
-                        )}
-                      </TouchableOpacity>
+  return (
+    <TouchableOpacity
+      key={item.id}
+      style={styles.noteCard}
+      activeOpacity={0.75}
+      onPress={() => openModalForEdit(item)}
+    >
+      {/* <View style={styles.noteAccentBar} /> */}
+      
+      <View style={styles.noteContentContainer}>
+        <Text style={styles.noteTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
 
-                      {/* Task Details (Tap to Edit, Clickable URLs inside) */}
-                      <TouchableOpacity
-                        style={styles.taskContentContainer}
-                        activeOpacity={0.75}
-                        onPress={() => openModalForEdit(item)}
-                      >
-                        <Text
-                          style={[
-                            styles.taskTitle,
-                            item.completed && styles.taskTitleCompleted,
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {item.title}
-                        </Text>
+        <Text style={styles.noteSnippet} numberOfLines={2}>
+          {item.content}
+        </Text>
+        <Text style={styles.noteDate}>{item.updatedAt}</Text>
+      </View>
 
-                        {item.description.length > 0 && (
-                          <LinkifiedText
-                            text={item.description}
-                            style={[
-                              styles.taskSnippet,
-                              item.completed && styles.taskSnippetCompleted,
-                            ]}
-                            linkColor={COLORS.accent}
-                            numberOfLines={2}
-                          />
-                        )}
+      {/* Right Column: Folder Badge placed directly above the Delete Icon */}
+      <View style={styles.noteRightActions}>
+        {assignedFolder ? (
+          <View style={styles.noteFolderBadge}>
+            <Ionicons
+              name={assignedFolder.icon}
+              size={11}
+              color={COLORS.accent}
+            />
+            <Text style={styles.noteFolderBadgeText}>
+              {assignedFolder.name}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.badgePlaceholder} />
+        )}
 
-                        <Text style={styles.taskDate}>{item.updatedAt}</Text>
-                      </TouchableOpacity>
-
-                      {/* Right Column: Folder Badge aligned directly above Delete Icon */}
-                      <View style={styles.taskRightActions}>
-                        {assignedFolder ? (
-                          <View style={styles.taskFolderBadge}>
-                            <Ionicons
-                              name={assignedFolder.icon}
-                              size={11}
-                              color={COLORS.accent}
-                            />
-                            <Text style={styles.taskFolderBadgeText}>
-                              {assignedFolder.name}
-                            </Text>
-                          </View>
-                        ) : (
-                          <View style={styles.badgePlaceholder} />
-                        )}
-
-                        <TouchableOpacity
-                          style={styles.deleteButton}
-                          onPress={() => handleDeleteTask(item.id)}
-                        >
-                          <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  );
-                })}
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDeleteNote(item.id)}
+          hitSlop={6}
+        >
+          <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+})}
               </View>
             )}
+
+
+          
+
           </View>
         </ScrollView>
 
@@ -685,43 +585,50 @@ export default function TasksScreen() {
           <Ionicons name="add" size={28} color={COLORS.accentText} />
         </TouchableOpacity>
 
-        {/* Centered Add/Edit Task Modal */}
+        {/* Add/Edit Note Bottom Sheet Overlay */}
         <Modal
-          animationType="none"
+          animationType="slide"
           transparent={true}
           visible={modalVisible}
           onRequestClose={closeModal}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.centeredModalOverlay}
+            style={styles.modalOverlay}
           >
             <Pressable style={styles.modalBackdrop} onPress={closeModal} />
 
-            <View style={styles.centeredModalContent}>
+            <View style={styles.modalContent}>
+              <View style={styles.sheetHandle} />
+
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderTitle}>
-                  {currentTaskId ? 'Edit Task' : 'New Task'}
+                  {currentNoteId ? 'Edit Note' : 'New Note'}
                 </Text>
                 <TouchableOpacity onPress={closeModal}>
                   <Ionicons name="close" size={24} color={COLORS.textSecondary} />
                 </TouchableOpacity>
               </View>
 
-              {/* <View style={styles.folderSelectorWrapper}>
+              {/* Folder Selector inside Note Sheet */}
+              {/* <View style={styles.noteFolderSelectorWrapper}>
                 <Text style={styles.folderSelectorLabel}>Folder:</Text>
-                <HorizontalScrollBar contentContainerStyle={styles.folderPillsRow}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.noteFolderPillsRow}
+                >
                   <TouchableOpacity
                     style={[
-                      styles.folderPill,
-                      taskFolderId === null && styles.folderPillActive,
+                      styles.noteFolderPill,
+                      noteFolderId === null && styles.noteFolderPillActive,
                     ]}
-                    onPress={() => setTaskFolderId(null)}
+                    onPress={() => setNoteFolderId(null)}
                   >
                     <Text
                       style={[
-                        styles.folderPillText,
-                        taskFolderId === null && styles.folderPillTextActive,
+                        styles.noteFolderPillText,
+                        noteFolderId === null && styles.noteFolderPillTextActive,
                       ]}
                     >
                       None
@@ -729,15 +636,15 @@ export default function TasksScreen() {
                   </TouchableOpacity>
 
                   {folders.map((folder) => {
-                    const active = taskFolderId === folder.id;
+                    const active = noteFolderId === folder.id;
                     return (
                       <TouchableOpacity
                         key={folder.id}
                         style={[
-                          styles.folderPill,
-                          active && styles.folderPillActive,
+                          styles.noteFolderPill,
+                          active && styles.noteFolderPillActive,
                         ]}
-                        onPress={() => setTaskFolderId(folder.id)}
+                        onPress={() => setNoteFolderId(folder.id)}
                       >
                         <Ionicons
                           name={folder.icon}
@@ -746,8 +653,8 @@ export default function TasksScreen() {
                         />
                         <Text
                           style={[
-                            styles.folderPillText,
-                            active && styles.folderPillTextActive,
+                            styles.noteFolderPillText,
+                            active && styles.noteFolderPillTextActive,
                           ]}
                         >
                           {folder.name}
@@ -755,10 +662,10 @@ export default function TasksScreen() {
                       </TouchableOpacity>
                     );
                   })}
-                </HorizontalScrollBar>
+                </ScrollView>
               </View> */}
 
-{/* newer */}
+{/* newer--- */}
 <View style={styles.folderSelectorWrapper}>
   <Text style={styles.folderSelectorLabel}>Folder:</Text>
   
@@ -766,15 +673,15 @@ export default function TasksScreen() {
     <HorizontalScrollBar contentContainerStyle={styles.folderPillsRow}>
       <TouchableOpacity
         style={[
-          styles.folderPill,
-          taskFolderId === null && styles.folderPillActive,
+          styles.noteFolderPill,
+          noteFolderId === null && styles.noteFolderPillActive,
         ]}
-        onPress={() => setTaskFolderId(null)}
+        onPress={() => setNoteFolderId(null)}
       >
         <Text
           style={[
-            styles.folderPillText,
-            taskFolderId === null && styles.folderPillTextActive,
+            styles.noteFolderPillText,
+            noteFolderId === null && styles.noteFolderPillTextActive,
           ]}
         >
           None
@@ -782,17 +689,17 @@ export default function TasksScreen() {
       </TouchableOpacity>
 
       {folders.map((folder) => {
-        const active = taskFolderId === folder.id;
+        const active = noteFolderId === folder.id;
         const isFavourites = folder.id === 'favourites';
 
         return (
           <TouchableOpacity
             key={folder.id}
             style={[
-              styles.folderPill,
-              active && styles.folderPillActive,
+              styles.noteFolderPill,
+              active && styles.noteFolderPillActive,
             ]}
-            onPress={() => setTaskFolderId(folder.id)}
+            onPress={() => setNoteFolderId(folder.id)}
           >
             {isFavourites ? (
               <Ionicons
@@ -803,8 +710,8 @@ export default function TasksScreen() {
             ) : (
               <Text
                 style={[
-                  styles.folderPillText,
-                  active && styles.folderPillTextActive,
+                  styles.noteFolderPillText,
+                  active && styles.noteFolderPillTextActive,
                 ]}
               >
                 {folder.name}
@@ -817,53 +724,53 @@ export default function TasksScreen() {
   </View>
 </View>
 
+
               <TextInput
                 style={styles.inputTitle}
-                placeholder="Task title (e.g. Pay electricity bill)"
+                placeholder="Title"
                 placeholderTextColor={COLORS.textMuted}
                 value={title}
                 onChangeText={setTitle}
-                autoFocus
               />
 
               <TextInput
                 style={styles.inputBody}
-                placeholder="Optional details or links (https://...)..."
+                placeholder="Start typing your note here..."
                 placeholderTextColor={COLORS.textMuted}
                 multiline
                 textAlignVertical="top"
-                value={description}
-                onChangeText={setDescription}
+                value={content}
+                onChangeText={setContent}
               />
 
               <View style={styles.modalFooter}>
                 <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
-                  <Text style={styles.saveButtonText}>
-                    {currentTaskId ? 'Update Task' : 'Add Task'}
-                  </Text>
+                <TouchableOpacity style={styles.saveButton} onPress={handleSaveNote}>
+                  <Text style={styles.saveButtonText}>Save Note</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </KeyboardAvoidingView>
         </Modal>
 
-        {/* Centered Create / Edit Folder Modal */}
+        {/* Create / Edit Folder Bottom Sheet Overlay */}
         <Modal
-          animationType="fade"
+          animationType="slide"
           transparent={true}
           visible={folderModalVisible}
           onRequestClose={closeFolderModal}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.centeredModalOverlay}
+            style={styles.modalOverlay}
           >
             <Pressable style={styles.modalBackdrop} onPress={closeFolderModal} />
 
-            <View style={styles.centeredModalContent}>
+            <View style={styles.modalContent}>
+              <View style={styles.sheetHandle} />
+
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderTitle}>
                   {editingFolder ? 'Rename Folder' : 'Create Folder'}
@@ -875,7 +782,7 @@ export default function TasksScreen() {
 
               <TextInput
                 style={styles.inputTitle}
-                placeholder="Folder name (e.g. Work, Groceries)"
+                placeholder="Folder name (e.g. Bills, Savings Goals)"
                 placeholderTextColor={COLORS.textMuted}
                 value={folderNameInput}
                 onChangeText={setFolderNameInput}
@@ -907,7 +814,7 @@ export default function TasksScreen() {
 }
 
 const styles = StyleSheet.create({
-// newer ----
+  // newer ----
 folderSelectorWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -931,13 +838,68 @@ folderSelectorWrapper: {
   },
 // ----
 
+  // --- newer
+noteCard: {
+    flexDirection: 'row',
+    alignItems: 'stretch', // Ensures vertical alignment across items
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
+
+    marginBottom: 10, 
+    padding: 16,
+  },
+  noteContentContainer: {
+    flex: 1,
+    paddingLeft: 12,
+    paddingRight: 12,
+    justifyContent: 'center',
+  },
+  // Right column aligning the folder badge directly above the delete icon
+  noteRightActions: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  noteFolderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceElevated,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 4,
+  },
+  noteFolderBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.accent,
+  },
+  badgePlaceholder: {
+    height: 18,
+  },
+  deleteButton: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // =---
+
+
   outerContainer: {
     flex: 1,
     backgroundColor: COLORS.bg,
   },
   scrollContent: {
     paddingTop: 24,
-    paddingBottom: 110,
+    paddingBottom: 100,
   },
   contentWrapper: {
     width: '100%',
@@ -956,8 +918,10 @@ folderSelectorWrapper: {
     // fontWeight: '800',
 
     // ---
-     marginTop: 20, 
+    // fontSize: 40,
+    marginTop: 20, 
     fontWeight: '400',
+    
     fontFamily: 'serif',
     fontSize: 50,
     // ---
@@ -969,27 +933,6 @@ folderSelectorWrapper: {
     color: COLORS.textSecondary,
     marginTop: 4,
   },
-  headerRightActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  clearCompletedBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 4,
-  },
-  clearCompletedText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-  },
   countBadge: {
     backgroundColor: 'rgba(245, 158, 11, 0.15)',
     borderWidth: 1,
@@ -998,18 +941,21 @@ folderSelectorWrapper: {
     paddingVertical: 6,
     borderRadius: 20,
   },
-  taskCount: {
+  noteCount: {
     fontSize: 13,
     fontWeight: '700',
     color: COLORS.accent,
   },
- foldersSection: {
-    marginTop: 12,
+
+  // Folders Bar
+  foldersSection: {
+    // marginBottom: 16,
+        marginTop: 12,
     marginBottom: 20,
   },
   foldersScrollContent: {
     gap: 8,
-    paddingVertical: 4,
+    paddingVertical: 2,
     alignItems: 'center',
   },
   folderChip: {
@@ -1064,6 +1010,8 @@ folderSelectorWrapper: {
     fontWeight: '700',
     color: COLORS.accent,
   },
+
+  // Search Bar
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1073,7 +1021,7 @@ folderSelectorWrapper: {
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 48,
-    
+
     marginTop: 10, 
     marginBottom: 30,
   },
@@ -1090,14 +1038,16 @@ folderSelectorWrapper: {
       } as any,
     }),
   },
+
+  // Empty & Notes List
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 64,
-    backgroundColor: COLORS.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    // backgroundColor: COLORS.surface,
+    // borderRadius: 16,
+    // borderWidth: 1,
+    // borderColor: COLORS.border,
   },
   emptyText: {
     fontSize: 18,
@@ -1111,105 +1061,80 @@ folderSelectorWrapper: {
     marginTop: 6,
   },
   listContainer: {
-    gap: 12,
+    gap: 14,
   },
-  taskCard: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    backgroundColor: COLORS.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLORS.border,
 
-    marginBottom: 10, 
-    padding: 16,
-  },
-  taskCardCompleted: {
-    opacity: 0.65,
-    backgroundColor: '#14171D',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 7,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-    alignSelf: 'center',
-    backgroundColor: 'transparent',
-  },
-  checkboxChecked: {
+
+  // noteCard: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: COLORS.surface,
+  //   borderRadius: 14,
+  //   borderWidth: 1,
+  //   borderColor: COLORS.border,
+  //   padding: 16,
+  //   overflow: 'hidden',
+  // },
+  noteAccentBar: {
+    width: 4,
+    height: '100%',
     backgroundColor: COLORS.accent,
-    borderColor: COLORS.accent,
+    borderRadius: 2,
+    marginRight: 14,
   },
-  taskContentContainer: {
-    flex: 1,
-    paddingRight: 12,
-    justifyContent: 'center',
-  },
-  taskTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
+  // noteContentContainer: {
+  //   flex: 1,
+  //   paddingRight: 12,
+  // },
+  noteTopMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
     marginBottom: 4,
   },
-  taskTitleCompleted: {
-    textDecorationLine: 'line-through',
-    color: COLORS.textSecondary,
+  noteTitle: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
   },
-  taskSnippet: {
+  // noteFolderBadge: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: COLORS.surfaceElevated,
+  //   borderWidth: 1,
+  //   borderColor: COLORS.border,
+  //   paddingHorizontal: 8,
+  //   paddingVertical: 3,
+  //   borderRadius: 12,
+  //   gap: 4,
+  // },
+  // noteFolderBadgeText: {
+  //   fontSize: 11,
+  //   fontWeight: '700',
+  //   color: COLORS.accent,
+  // },
+  noteSnippet: {
     fontSize: 14,
     color: COLORS.textSecondary,
     lineHeight: 20,
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  taskSnippetCompleted: {
-    textDecorationLine: 'line-through',
-    color: COLORS.textMuted,
-  },
-  taskDate: {
+  noteDate: {
     fontSize: 12,
     color: COLORS.accent,
     fontWeight: '600',
   },
-
-  // Right column aligning folder badge directly above delete icon
-  taskRightActions: {
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  taskFolderBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    gap: 4,
-  },
-  taskFolderBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: COLORS.accent,
-  },
-  badgePlaceholder: {
-    height: 18,
-  },
-  deleteButton: {
-    padding: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-  },
-
+  // deleteButton: {
+  //   padding: 8,
+  //   borderRadius: 10,
+  //   backgroundColor: 'rgba(239, 68, 68, 0.12)',
+  // },
   fab: {
     position: 'absolute',
     right: 24,
-    bottom: 84,
+    bottom: 28,
     width: 58,
     height: 58,
     borderRadius: 29,
@@ -1222,57 +1147,68 @@ folderSelectorWrapper: {
     shadowRadius: 8,
     elevation: 6,
   },
-  centeredModalOverlay: {
+
+  // Bottom Sheet Overlays
+  modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    justifyContent: 'flex-end',
   },
   modalBackdrop: {
-    ...StyleSheet.absoluteFill,
+    flex: 1,
   },
-  centeredModalContent: {
+  modalContent: {
     backgroundColor: COLORS.surface,
-    borderRadius: 20,
-    borderWidth: 1,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
     borderColor: COLORS.border,
-    padding: 22,
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 34 : 24,
     width: '100%',
-    maxWidth: 540,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 10,
+    maxWidth: 800,
+    alignSelf: 'center',
+  },
+  sheetHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.border,
+    alignSelf: 'center',
+    marginBottom: 14,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   modalHeaderTitle: {
     fontSize: 20,
     fontWeight: '800',
     color: COLORS.textPrimary,
   },
-  // folderSelectorWrapper: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   marginBottom: 14,
-  //   gap: 10,
-  // },
+
+  // Folder selector inside Note modal
+  noteFolderSelectorWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+    gap: 10,
+  },
   // folderSelectorLabel: {
   //   fontSize: 13,
   //   fontWeight: '700',
   //   color: COLORS.textSecondary,
   // },
-  // folderPillsRow: {
-  //   gap: 8,
-  //   alignItems: 'center',
-  // },
-  folderPill: {
+  noteFolderPillsRow: {
+    gap: 8,
+    alignItems: 'center',
+  },
+  noteFolderPill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surfaceElevated,
@@ -1283,18 +1219,19 @@ folderSelectorWrapper: {
     borderRadius: 16,
     gap: 5,
   },
-  folderPillActive: {
+  noteFolderPillActive: {
     backgroundColor: COLORS.accent,
     borderColor: COLORS.accent,
   },
-  folderPillText: {
+  noteFolderPillText: {
     fontSize: 12,
     fontWeight: '700',
     color: COLORS.textSecondary,
   },
-  folderPillTextActive: {
+  noteFolderPillTextActive: {
     color: COLORS.accentText,
   },
+
   inputTitle: {
     backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
@@ -1321,7 +1258,7 @@ folderSelectorWrapper: {
     paddingVertical: 12,
     fontSize: 15,
     color: COLORS.textPrimary,
-    minHeight: 120,
+    minHeight: 150,
     marginBottom: 20,
     ...Platform.select({
       web: {
@@ -1358,4 +1295,3 @@ folderSelectorWrapper: {
     fontSize: 15,
   },
 });
-

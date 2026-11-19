@@ -51,9 +51,9 @@ interface Folder {
 
 const PREDEFINED_FOLDERS: Folder[] = [
   { id: 'favourites', name: 'Favourites', icon: 'star', isPredefined: true },
-  { id: 'day', name: 'Day', icon: 'today', isPredefined: true },
-  { id: 'week', name: 'Week', icon: 'calendar', isPredefined: true },
-  { id: 'month', name: 'Month', icon: 'calendar-number', isPredefined: true },
+  // { id: 'day', name: 'Day', icon: 'today', isPredefined: true },
+  // { id: 'week', name: 'Week', icon: 'calendar', isPredefined: true },
+  // { id: 'month', name: 'Month', icon: 'calendar-number', isPredefined: true },
 ];
 
 export default function LinksScreen() {
@@ -317,7 +317,7 @@ export default function LinksScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.headerTitle}>Links</Text>
                 <Text style={styles.headerSubtitle}>
-                  Save and organise links and web resources
+                  Save links and web resources
                 </Text>
               </View>
 
@@ -950,10 +950,10 @@ folderSelectorWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 64,
-    backgroundColor: COLORS.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    // backgroundColor: COLORS.surface,
+    // borderRadius: 16,
+    // borderWidth: 1,
+    // borderColor: COLORS.border,
   },
   emptyText: {
     fontSize: 18,
@@ -1038,7 +1038,9 @@ folderSelectorWrapper: {
   fab: {
     position: 'absolute',
     right: 24,
-    bottom: 84,
+    // bottom: 84,
+    bottom: 28,
+
     width: 58,
     height: 58,
     borderRadius: 29,

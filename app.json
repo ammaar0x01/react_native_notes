@@ -10,7 +10,7 @@
     "userInterfaceStyle": "automatic",
 
     "ios": {
-      "icon": "./assets/icon.jpeg",
+      "icon": "./assets/logo-foreground.png",
       "bundleIdentifier": "com.amm0x01.notes",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -19,14 +19,14 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#050807",
-        "foregroundImage": "./assets/adaptive-icon.png"
+        "foregroundImage": "./assets/logo-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.amm0x01.notes"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo-icon.png"
     },
     "plugins": [
       "expo-router",
@@ -34,12 +34,12 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#050807",
-          "image": "./assets/splash-icon.jpeg",
+          "image": "./assets/logo-icon.png",
           "imageWidth": 140,
           "resizeMode": "contain",
           "dark": {
             "backgroundColor": "#000000",
-            "image": "./assets/splash-icon.jpeg"
+            "image": "./assets/logo-icon.png"
           }
         }
       ],
