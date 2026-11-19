@@ -4,11 +4,9 @@
     "slug": "notes",
     "version": "1.0.0",
     "orientation": "portrait",
-
     "icon": "./assets/logo-icon.png",
     "scheme": "notes",
     "userInterfaceStyle": "automatic",
-
     "ios": {
       "icon": "./assets/logo-foreground.png",
       "bundleIdentifier": "com.amm0x01.notes",
@@ -53,7 +51,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f15b1cee-9584-4261-8242-acefbb3b9e84"
+        "projectId": "dec2c6ae-9fea-431b-babb-0731483572e3"
       }
     }
   }

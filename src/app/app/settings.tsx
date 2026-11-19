@@ -303,7 +303,7 @@ export default function SettingsScreen() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        const subject = encodeURIComponent('Money Manager - Productivity Backup');
+        const subject = encodeURIComponent('Notes - Productivity Backup');
         const body = encodeURIComponent('Please find your downloaded notes and productivity JSON backup file attached.');
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
         notify('Email Ready', 'Your backup file has been downloaded. Please attach it to your email.');
@@ -320,7 +320,7 @@ export default function SettingsScreen() {
         await FileSystem.writeAsStringAsync(fileUri, content, { encoding: FileSystem.EncodingType.UTF8 });
 
         await MailComposer.composeAsync({
-          subject: 'Money Manager - Automated Productivity Backup',
+          subject: 'Notes - Automated Productivity Backup',
           body: 'Attached is your latest notes and productivity JSON backup file.',
           attachments: [fileUri],
         });
