@@ -10,11 +10,13 @@ import {
   Platform,
   StyleProp,
   ViewStyle,
+  Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, Redirect } from 'expo-router';
 import { openBrowserAsync, WebBrowserPresentationStyle } from 'expo-web-browser';
 import Head from 'expo-router/head';
+// ------------------------------------
 
 const HERO_IMAGE = require('@/images/hero.jpg');
 
@@ -45,6 +47,9 @@ Your task is to convert spreadsheet data, markdown notes, or raw text into a val
 
 const DOWNLOAD_URL =
   'https://github.com/ammaar0x01/react_native_money_manager/releases/tag/release-v1-0-0';
+
+  const GITHUB_URL = 'https://github.com/ammaar0x01';
+
 
 const COLORS = {
   bg: '#0F1115',
@@ -97,7 +102,7 @@ function HoverPressable({
   );
 }
 
-export default function LandingScreen() {
+function LandingScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const params = useLocalSearchParams();
   const [importSectionY, setImportSectionY] = useState(0);
@@ -374,10 +379,43 @@ export default function LandingScreen() {
           </View>
 
           {/* Footer */}
-          <View style={styles.footer}>
+          {/* <View style={styles.footer}>
             <Text style={styles.footerText}>© 2026 Notes Workspace</Text>
             <Text style={styles.footerText}>Built with React Native & Expo</Text>
-          </View>
+
+             <HoverPressable
+            style={styles.navLaunchButton}
+            hoverStyle={styles.navLaunchButtonHover}
+            pressedStyle={styles.navLaunchButtonPressed}
+            accessibilityLabel="Open the Notes app"
+            onPress={() => router.replace('/app' as any)}
+          >
+            <Text style={styles.navLaunchButtonText}>Go to App</Text>
+            <Ionicons name="pencil" size={16} color={COLORS.accentText} style={{ marginLeft: 6 }} />
+          </HoverPressable>
+          </View> */}
+
+
+          {/* Footer */}
+{/* Footer */}
+<View style={styles.footer}>
+  <Text style={styles.footerText}>© 2026 Notes Workspace</Text>
+  <Text style={styles.footerText}>Built with React Native & Expo</Text>
+
+  <HoverPressable
+    style={styles.githubLink}
+    hoverStyle={styles.githubLinkHover}
+    pressedStyle={styles.githubLinkPressed}
+    accessibilityLabel="View source code on GitHub"
+    // accessibilityRole="link"
+    onPress={() => Linking.openURL(GITHUB_URL)}
+  >
+    <Ionicons name="logo-github" size={40} color="#FFFFFF" />
+    {/* <Text style={styles.githubLinkText}>GitHub</Text> */}
+  </HoverPressable>
+</View>
+
+
         </ScrollView>
       </View>
     </>
@@ -385,6 +423,30 @@ export default function LandingScreen() {
 }
 
 const styles = StyleSheet.create({
+
+  // newer -----
+githubLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 4,
+    marginTop: 10, 
+  },
+  githubLinkHover: {
+    opacity: 0.8,
+  },
+  githubLinkPressed: {
+    opacity: 0.6,
+  },
+  githubLinkText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // -------------
+
+  // --- MAIN 
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -802,3 +864,39 @@ const styles = StyleSheet.create({
   },
 });
 
+
+
+
+// import LandingScreen from '@/app/index';
+
+export default function IndexRoute() {
+  const { scrollTo, view } = useLocalSearchParams<{
+    scrollTo?: string;
+    view?: string;
+  }>();
+
+  // Allow mobile users to open the landing page explicitly (e.g., for the JSON Import Guide)
+  const allowLandingOnNative = Boolean(scrollTo) || view === 'landing';
+
+  if (Platform.OS !== 'web' && !allowLandingOnNative) {
+    return <Redirect href="/app" />;
+  }
+
+  return <LandingScreen />;
+}
+
+
+
+// newer -remove later-
+// import { Platform } from 'react-native';
+// import { Redirect } from 'expo-router';
+
+// import LandingScreen from '@/app/landing'; 
+
+// export default function IndexRoute() {
+//   if (Platform.OS !== 'web') {
+//     return <Redirect href="/app" />; // or "/app/notes"
+//   }
+
+//   return <LandingScreen />;
+// }

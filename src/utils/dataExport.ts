@@ -209,58 +209,92 @@ export const normalizeImport = (parsed: unknown): ImportData => {
 
 
 //  timwer 
-export const LAST_BACKUP_KEY = "@notes_app_last_backup_timestamp";
-const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-// const ONE_WEEK_MS = 60 * 1000;
+// export const LAST_BACKUP_KEY = "@notes_app_last_backup_timestamp";
+// const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+// // const ONE_WEEK_MS = 60 * 1000;
 
+
+// export const recordBackupTimestamp = async (): Promise<void> => {
+//   try {
+//     await AsyncStorage.setItem(LAST_BACKUP_KEY, String(Date.now()));
+//   } catch (error) {
+//     console.error("Failed to record backup timestamp", error);
+//   }
+// };
+
+// export const checkAndPromptWeeklyBackup = async (onConfirmBackup: () => void) => {
+//   try {
+//     const lastBackupStr = await AsyncStorage.getItem(LAST_BACKUP_KEY);
+//     const now = Date.now();
+
+//     // Skip prompting on the very first launch if desired, or seed the initial timestamp
+//     if (!lastBackupStr) {
+//       await AsyncStorage.setItem(LAST_BACKUP_KEY, String(now));
+//       return;
+//     }
+
+//     if (now - Number(lastBackupStr) > ONE_WEEK_MS) {
+//       if (Platform.OS === "web") {
+//         if (
+//           window.confirm(
+//             "Weekly Backup Reminder: It has been over 7 days since your last backup. Would you like to export a fresh JSON backup now?"
+//           )
+//         ) {
+//           onConfirmBackup();
+//           await recordBackupTimestamp();
+//         }
+//       } else {
+//         Alert.alert(
+//           "Weekly Backup Reminder",
+//           "It has been over 7 days since your last backup. Would you like to back up your notes, tasks, and links now?",
+//           [
+//             { text: "Later", style: "cancel" },
+//             {
+//               text: "Backup Now",
+//               onPress: async () => {
+//                 onConfirmBackup();
+//                 await recordBackupTimestamp();
+//               },
+//             },
+//           ]
+//         );
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Failed to check weekly backup status", error);
+//   }
+// };
+
+
+// newer
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const LAST_BACKUP_KEY = '@notes_app_last_backup_timestamp';
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+// const ONE_WEEK_MS = 60 * 1000; 
 
 export const recordBackupTimestamp = async (): Promise<void> => {
   try {
     await AsyncStorage.setItem(LAST_BACKUP_KEY, String(Date.now()));
   } catch (error) {
-    console.error("Failed to record backup timestamp", error);
+    console.error('Failed to record backup timestamp', error);
   }
 };
 
-export const checkAndPromptWeeklyBackup = async (onConfirmBackup: () => void) => {
+export const shouldPromptWeeklyBackup = async (): Promise<boolean> => {
   try {
     const lastBackupStr = await AsyncStorage.getItem(LAST_BACKUP_KEY);
     const now = Date.now();
 
-    // Skip prompting on the very first launch if desired, or seed the initial timestamp
+    // Seed timestamp on very first launch without interrupting the user
     if (!lastBackupStr) {
       await AsyncStorage.setItem(LAST_BACKUP_KEY, String(now));
-      return;
+      return false;
     }
 
-    if (now - Number(lastBackupStr) > ONE_WEEK_MS) {
-      if (Platform.OS === "web") {
-        if (
-          window.confirm(
-            "Weekly Backup Reminder: It has been over 7 days since your last backup. Would you like to export a fresh JSON backup now?"
-          )
-        ) {
-          onConfirmBackup();
-          await recordBackupTimestamp();
-        }
-      } else {
-        Alert.alert(
-          "Weekly Backup Reminder",
-          "It has been over 7 days since your last backup. Would you like to back up your notes, tasks, and links now?",
-          [
-            { text: "Later", style: "cancel" },
-            {
-              text: "Backup Now",
-              onPress: async () => {
-                onConfirmBackup();
-                await recordBackupTimestamp();
-              },
-            },
-          ]
-        );
-      }
-    }
+    return now - Number(lastBackupStr) > ONE_WEEK_MS;
   } catch (error) {
-    console.error("Failed to check weekly backup status", error);
+    console.error('Failed to check weekly backup status', error);
+    return false;
   }
 };

@@ -1,28 +1,41 @@
 {
-    "app_name": "Notes", 
-    "app_type": "cross-platform; (Web-app and Android app)",
-    
-    "started": "2026-11-17",
-    "updated": "2026-11-18",
-    "status": "work-in-progress",
-    "version_dev": "0.1", 
-    "version_release": "1.0.0", 
+  "app_name": "Notes",
+  "app_type": "cross-platform; (Web-app and Android app)",
 
-    "notes": [
-        "Expo version: 57", 
-        "Sitemap URL: http://localhost:8081/_sitemap"
-    ], 
+  "started": "2026-11-17",
+  "updated": "2026-11-20",
+  "status": "work-in-progress",
+  "dev_version": "0.4",
+  "release_version": "1.1.0",
 
-    "technologies_used": [
-        "react native", 
-        "expo"
-    ], 
+  "notes": ["Expo version: 57", "Sitemap URL: http://localhost:8081/_sitemap"],
 
-    "tools_used": [
-        "Visual Studio Code", 
-        "https://gemini.google.com/app",
-        "https://opencode.ai", 
-        "https://lucide.dev/icons/wallet", 
-        "https://www.pexels.com" 
-    ]
+  "technologies_used": ["react native", "expo"],
+
+  "tools_used": [
+    "Visual Studio Code",
+    "https://gemini.google.com/app",
+    "https://opencode.ai",
+    "https://lucide.dev/icons/wallet",
+    "https://www.pexels.com"
+  ],
+
+  "updates": {
+    "1": {
+      "date": "2026-11-21",
+      "release_version": "1.1.0", 
+
+      "additions": [""],
+      "improvements": [""],
+      "removals": [""],
+      "other": [""]
+    },
+
+    "2026-11-21": {
+      "additions": [""],
+      "improvements": [""],
+      "removals": [""],
+      "other": [""]
+    }
+  }
 }

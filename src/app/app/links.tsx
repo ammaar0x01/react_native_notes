@@ -273,7 +273,9 @@ export default function LinksScreen() {
     setCurrentLinkId(null);
     setTitle('');
     setUrl('');
-    setLinkFolderId(selectedFolderId === 'all' ? 'day' : selectedFolderId);
+    // setLinkFolderId(selectedFolderId === 'all' ? 'None' : selectedFolderId);
+    setLinkFolderId(selectedFolderId === 'all' ? null : selectedFolderId);
+    
     setModalVisible(true);
   };
 
@@ -300,7 +302,7 @@ export default function LinksScreen() {
   return (
     <>
       <Head>
-        <title>My Links</title>
+        <title>Links</title>
       </Head>
 
       <KeyboardAvoidingView
@@ -555,7 +557,7 @@ export default function LinksScreen() {
 
         {/* Centered Add/Edit Link Modal */}
         <Modal
-          animationType="fade"
+          animationType="none"
           transparent={true}
           visible={modalVisible}
           onRequestClose={closeModal}

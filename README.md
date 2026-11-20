@@ -2,8 +2,8 @@
 
 - Started:                 2026-11-17
 - Updated:                 2026-11-19
-- Version (development):   0.3
-- Version (release):       1.0.0
+- Version (development):   0.4
+- Version (release):       1.1.0
 - Status:                  work-in-progress
 ---
 
@@ -26,9 +26,11 @@
 
 
 ### Mobile App
-| Landing Page | Notes & Tasks | Links & Settings |
-| :---: | :---: | :---: |
-| ![Landing Page](/public/screenshots/phone1.jpeg) | ![Notes & Tasks](/public/screenshots/phone2.jpeg) | ![Links & Settings](/public/screenshots/phone3.jpeg) |
+| Landing Page | Notes & Tasks | 
+| :---: | :---: | 
+| ![Landing Page](/public/screenshots/phone1.jpeg) | ![Notes & Tasks](/public/screenshots/phone2.jpeg) |
+
+![Links & Settings](/public/screenshots/phone3.jpeg) 
 ---
 
 

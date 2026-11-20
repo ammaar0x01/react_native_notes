@@ -32,7 +32,7 @@ const COLORS = {
   textPrimary: '#FFFFFF',
   textSecondary: '#9CA3AF',
   textMuted: '#6B7280',
-  accent: '#F59E0B', // Yellow-Orange
+  accent: '#F59E0B', 
   accentText: '#111827',
   danger: '#EF4444',
 };

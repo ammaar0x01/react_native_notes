@@ -53,6 +53,7 @@ interface Folder {
 
 const PREDEFINED_FOLDERS: Folder[] = [
   { id: 'favourites', name: 'Favourites', icon: 'star', isPredefined: true },
+  { id: 'repetitive', name: 'Repetitive', icon: 'repeat', isPredefined: true },
   { id: 'day', name: 'Day', icon: 'today', isPredefined: true },
   { id: 'week', name: 'Week', icon: 'calendar', isPredefined: true },
   { id: 'month', name: 'Month', icon: 'calendar-number', isPredefined: true },
@@ -304,7 +305,9 @@ export default function TasksScreen() {
     setCurrentTaskId(null);
     setTitle('');
     setDescription('');
-    setTaskFolderId(selectedFolderId === 'all' ? 'day' : selectedFolderId);
+    // setTaskFolderId(selectedFolderId === 'all' ? 'none' : selectedFolderId);
+    setTaskFolderId(selectedFolderId === 'all' ? null : selectedFolderId);
+  
     setModalVisible(true);
   };
 
